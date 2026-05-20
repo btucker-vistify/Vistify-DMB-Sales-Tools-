@@ -1123,6 +1123,9 @@
     // Publish the computed SKU body for the sibling Screen Selector page,
     // so its SKU pill can display the full combined SKU too.
     saveSkuBody(baseSku);
+    // Persist the full calculator configuration so navigating away and back
+    // restores the user's inputs exactly.
+    saveCalcState();
     renderSkuPrefixHint();
     drawDiagram(perScreenW, perScreenH, state.count);
     updateRecommendations();
@@ -1254,6 +1257,54 @@
   const SKU_PREFIX_KEY = 'vistify.skuPrefix';
   const SKU_PREFIX_NAME_KEY = 'vistify.skuPrefixName';
   const SKU_BODY_KEY = 'vistify.skuBody';
+  const CALC_STATE_KEY = 'vistify.calcState';
+
+  // Persist the calculator's configuration object so navigating to the Screen
+  // Selector and back preserves the user's inputs (count, size, orientation,
+  // mount type, ceiling height, etc.). Called automatically from compute().
+  function saveCalcState() {
+    try { localStorage.setItem(CALC_STATE_KEY, JSON.stringify(state)); }
+    catch (e) { /* non-fatal */ }
+  }
+  function loadCalcState() {
+    try {
+      const raw = localStorage.getItem(CALC_STATE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  // Apply a previously-saved state object to both the in-memory `state` and
+  // the visible form controls so the UI matches what we restored.
+  function applyCalcStateToForm(s) {
+    if (!s || typeof s !== 'object') return;
+    // Whitelist of fields we know about — guards against unrelated keys.
+    ['size','orientation','count','mountType','mountSurface','ceilingHeight','headClearance','spaceWidth','spaceHeight'].forEach(k => {
+      if (s[k] !== undefined) state[k] = s[k];
+    });
+    // <select> and <input> values
+    const sz = document.getElementById('screenSize');
+    if (sz) sz.value = String(state.size);
+    const cnt = document.getElementById('screenCount');
+    if (cnt) cnt.value = String(state.count);
+    ['mountSurface','ceilingHeight','headClearance','spaceWidth','spaceHeight'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = state[id] === '' || state[id] == null ? '' : String(state[id]);
+    });
+    // Segmented controls (orientation + mountType buttons)
+    const orientGroup = document.getElementById('orientation');
+    if (orientGroup) orientGroup.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === state.orientation);
+    });
+    const mountGroup = document.getElementById('mountType');
+    if (mountGroup) mountGroup.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === state.mountType);
+    });
+    // Show/hide ceiling-specific inputs to match restored mount type
+    const ceilingInputs  = document.getElementById('ceilingInputs');
+    const ceilingResults = document.getElementById('ceilingResults');
+    const showCeiling = state.mountType === 'ceiling';
+    if (ceilingInputs)  ceilingInputs.classList.toggle('hide', !showCeiling);
+    if (ceilingResults) ceilingResults.classList.toggle('hide', !showCeiling);
+  }
 
   function getSkuPrefix() {
     try { return localStorage.getItem(SKU_PREFIX_KEY) || ''; }
@@ -1895,6 +1946,9 @@
     });
   }
 
+  // Restore prior calculator configuration (if any) BEFORE the initial compute
+  // so the UI loads with the user's last inputs already in place.
+  applyCalcStateToForm(loadCalcState());
   compute();
 </script>
 
