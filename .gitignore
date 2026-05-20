@@ -1,0 +1,35 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.history/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local server / build cache (in case anything is ever added)
+node_modules/
+.cache/
+dist/
+build/
+
+# Temp / backup
+*.bak
+*.tmp
+~$*
+
+# Office lock files (Excel/Word leave these when files are open)
+~$*.xlsx
+~$*.docx
+~$*.pptx
