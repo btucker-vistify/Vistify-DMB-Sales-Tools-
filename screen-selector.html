@@ -216,8 +216,78 @@
   .options label { display: inline-flex; align-items: center; justify-content: center; padding: 7px 12px; border: 1px solid var(--line-2); background: #fff; color: var(--ink-2); border-radius: 999px; font-size: 13px; cursor: pointer; transition: all 0.15s; user-select: none; }
   .options label:hover { border-color: var(--v-black); color: var(--v-black); }
   .options input[type="radio"]:checked + label { background: var(--v-black); border-color: var(--v-black); color: #fff; font-weight: 600; }
-  .actions { display: flex; gap: 10px; margin-top: 14px; }
-  button { font-family: inherit; cursor: pointer; border-radius: 8px; padding: 11px 20px; font-size: 14px; font-weight: 700; border: 1px solid transparent; transition: all 0.15s; letter-spacing: 0.2px; }
+  /* Customer-profile action row — primary CTA "Get Recommendation" + Reset.
+     Promoted from inline buttons to a visually distinct call-to-action band
+     with a top separator and emphasized typography so the next step is
+     obvious after the user picks their answers. */
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  button { font-family: inherit; cursor: pointer; border-radius: 10px; padding: 11px 20px; font-size: 14px; font-weight: 700; border: 1px solid transparent; transition: all 0.15s ease; letter-spacing: 0.2px; }
+  .actions .btn-primary,
+  .actions .btn-ghost {
+    flex: 1 1 auto;
+    padding: 14px 22px;
+    font-size: 15px;
+    letter-spacing: 0.4px;
+  }
+  .actions .btn-primary {
+    flex: 2 1 auto;
+    background: var(--v-emerald);
+    color: #fff;
+    border-color: var(--v-emerald);
+    box-shadow: 0 4px 12px rgba(43,182,115,0.28), 0 1px 2px rgba(15,38,34,0.08);
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .actions .btn-primary::after {
+    content: "→";
+    font-size: 17px;
+    line-height: 1;
+    transition: transform 0.15s ease;
+  }
+  .actions .btn-primary:hover {
+    background: var(--v-emerald-dark);
+    border-color: var(--v-emerald-dark);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(43,182,115,0.38), 0 2px 4px rgba(15,38,34,0.12);
+  }
+  .actions .btn-primary:hover::after { transform: translateX(4px); }
+  .actions .btn-primary:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(43,182,115,0.28); }
+  .actions .btn-primary:focus-visible {
+    outline: 3px solid rgba(43,182,115,0.45);
+    outline-offset: 2px;
+  }
+  .actions .btn-ghost {
+    background: #fff;
+    color: var(--ink-2);
+    border: 1.5px solid var(--line-2);
+    text-transform: uppercase;
+  }
+  .actions .btn-ghost:hover {
+    border-color: var(--v-coral);
+    color: var(--v-coral);
+    background: #fff;
+  }
+  .actions .btn-ghost:focus-visible {
+    outline: 3px solid rgba(230,57,98,0.35);
+    outline-offset: 2px;
+  }
+  @media (max-width: 480px) {
+    .actions { flex-direction: column; gap: 10px; }
+    .actions .btn-primary, .actions .btn-ghost { flex: 1 1 auto; width: 100%; }
+  }
+  /* Legacy classes used elsewhere (copy-row buttons) — keep their original look */
   .btn-primary { background: var(--v-black); color: #fff; border-color: var(--v-black); }
   .btn-primary:hover { background: var(--v-emerald); border-color: var(--v-emerald); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(43,182,115,0.3); }
   .btn-ghost { background: #fff; color: var(--ink-2); border-color: var(--line-2); }
@@ -425,8 +495,8 @@
             <div class="caption">Operating-hours reference &middot; Minimal / 16/7 / 24/7</div>
           </div>
         </div>
-        <div class="question">
-          <label class="q">5. Warranty service preference</label>
+        <div class="question has-guide">
+          <label class="q">5. Warranty service preference <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="options" data-q="warranty">
             <input type="radio" name="warranty" id="war-fast" value="fast" checked />
             <label for="war-fast">Fast Track Replacement</label>
@@ -435,9 +505,13 @@
             <input type="radio" name="warranty" id="war-any" value="any" />
             <label for="war-any">No preference</label>
           </div>
+          <div class="guide-popover" role="img" aria-label="Warranty service reference: Fast Track Replacement vs. OnSite Repair">
+            <img src="assets/guides/warranty-service.jpg" srcset="assets/guides/warranty-service.jpg 1x, assets/guides/warranty-service@2x.jpg 2x" alt="Warranty service comparison — Fast Track Replacement (advance ship) vs. OnSite Repair (technician dispatch)" loading="lazy" />
+            <div class="caption">Warranty service reference</div>
+          </div>
         </div>
-        <div class="question">
-          <label class="q">6. Built-in SoC with Device Management required?</label>
+        <div class="question has-guide">
+          <label class="q">6. Built-in SoC with Device Management required? <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Commercial displays with built-in SoC reduce install complexity. Selecting No opens up the Consumer TV +VPlayer option.</div>
           <div class="options" data-q="soc">
             <input type="radio" name="soc" id="soc-yes" value="yes" checked />
@@ -445,10 +519,14 @@
             <input type="radio" name="soc" id="soc-no" value="no" />
             <label for="soc-no">No (open to external player)</label>
           </div>
+          <div class="guide-popover" role="img" aria-label="SoC with Device Management reference: Commercial SoC vs. External Player">
+            <img src="assets/guides/soc-device-management.jpg" srcset="assets/guides/soc-device-management.jpg 1x, assets/guides/soc-device-management@2x.jpg 2x" alt="SoC with Device Management — built-in commercial SoC vs. external Minix/VPlayer media player" loading="lazy" />
+            <div class="caption">SoC + device management reference</div>
+          </div>
         </div>
 
-        <div class="question">
-          <label class="q">7. Budget tier</label>
+        <div class="question has-guide">
+          <label class="q">7. Budget tier <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Estimated cost factor from spec sheet. $ is the budget consumer option, $$$$$ is premium.</div>
           <div class="options" data-q="budget">
             <input type="radio" name="budget" id="bud-1" value="1" />
@@ -461,6 +539,10 @@
             <label for="bud-4">$$$$</label>
             <input type="radio" name="budget" id="bud-5" value="5" />
             <label for="bud-5">$$$$$</label>
+          </div>
+          <div class="guide-popover" role="img" aria-label="Budget tier reference: $ through $$$$$">
+            <img src="assets/guides/budget-tier.jpg" srcset="assets/guides/budget-tier.jpg 1x, assets/guides/budget-tier@2x.jpg 2x" alt="Budget tier comparison — $ (budget consumer) through $$$$$ (premium commercial)" loading="lazy" />
+            <div class="caption">Budget tier reference &middot; $ to $$$$$</div>
           </div>
         </div>
         <div class="actions">
