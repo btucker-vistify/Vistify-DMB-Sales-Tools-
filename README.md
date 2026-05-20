@@ -1,4 +1,3 @@
-# Vistify-DMB-Sales-Tools-
 # Vistify Digital Menu Board Sales Tool
 
 A two-page browser-based sales tool for sizing and quoting Vistify digital
@@ -49,6 +48,8 @@ Storage keys (all under the `vistify.*` namespace):
 | `vistify.skuPrefix` | `screen-selector.html` | `dmb-calculator.html`, `screen-selector.html` | The selected SKU prefix string, e.g. `TCL-TM-`. |
 | `vistify.skuPrefixName` | `screen-selector.html` | `dmb-calculator.html` | Human-readable display name, e.g. `TCL TM Series`. |
 | `vistify.skuBody` | `dmb-calculator.html` | `screen-selector.html` | The computed configuration SKU body, e.g. `3x55WL`. |
+| `vistify.selectorPrefs` | `screen-selector.html` | `screen-selector.html` | JSON of the questionnaire answers, so the form survives navigation. |
+| `vistify.calcState` | `dmb-calculator.html` | `dmb-calculator.html` | JSON of the full calculator configuration (count, size, orientation, mount type, ceiling height, head clearance, etc.), so the calculator's inputs survive navigation. |
 
 The prefix keys are cleared together from the calculator via the **clear**
 link beneath the Configuration SKU pill. Both pages listen for the browser
