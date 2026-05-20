@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vistify - Commercial Display Brand & Model Selector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Vistify brand palette - matched to index.html */
+    --v-black: #0A0A0A;
+    --v-ink:   #0A0A0A;
+    --v-emerald:      #2BB673;   /* Vistify primary kelly green */
+    --v-emerald-dark: #1F9460;
+    --teal-light:     #DCF3E5;
+    --v-mint:         #A4E8C9;
+    --v-coral:        #E63962;   /* Vistify red wave accent */
+    --v-cream:        #F5F9F8;
+    --bg:    #F5F9F8;
+    --card:  #ffffff;
+    --ink:   var(--v-ink);
+    --ink-2: #2A3433;
+    --ink-3: #6B7C7B;
+    --muted: #6B7C7B;
+    --line:   #E2EAE8;
+    --line-2: #C9D6D3;
+    --accent:   var(--v-emerald);
+    --accent-2: var(--v-emerald-dark);
+    --good: var(--v-emerald);
+    --warn: #d97706;
+    --bad:  var(--v-coral);
+    --gold:   #d4a017;
+    --silver: #8a8a8a;
+    --bronze: #a05a14;
+    --tcl: #1f9d55;
+    --samsung: #1428a0;
+    --sony: #111111;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* Header (match attached index.html) */
+  header.header {
+    background: white;
+    color: var(--ink);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .logo {
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  .logo img { height: 100%; width: auto; display: block; }
+  header.header .divider {
+    width: 1px;
+    height: 30px;
+    background: var(--line);
+    flex-shrink: 0;
+  }
+  header.header .product-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    flex: 1 1 auto;
+  }
+  header.header .back-to-calc {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: var(--ink-2);
+    background: #fff;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  header.header .back-to-calc:hover {
+    background: var(--v-black);
+    color: #fff;
+    border-color: var(--v-black);
+  }
+  @media (max-width: 600px) {
+    header.header { padding: 14px 18px; gap: 12px; flex-wrap: wrap; }
+    .logo { height: 30px; }
+    header.header .divider { height: 22px; }
+    header.header .product-name { font-size: 11px; letter-spacing: 0.5px; }
+    header.header .back-to-calc { font-size: 11px; padding: 6px 10px; }
+  }
+
+  /* Subheader description bar */
+  .subheader {
+    background: white;
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  .subheader-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  @media (max-width: 600px) { .subheader { padding: 12px 18px; } .subheader-inner { font-size: 12px; } }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  main { padding: 32px 0 56px; }
+  .layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 980px) { .layout { grid-template-columns: 380px 1fr; } }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(15,38,34,0.04), 0 4px 16px rgba(15,38,34,0.05); overflow: hidden; }
+  .panel-head { padding: 18px 22px; border-bottom: 1px solid var(--line); background: #ffffff; display: flex; align-items: center; gap: 10px; }
+  .panel-head::before { content: ""; width: 24px; height: 24px; background: var(--v-emerald); border-radius: 50%; flex: 0 0 auto; }
+  .panel-head h2 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); text-transform: none; }
+  .panel-body { padding: 16px 20px 22px; }
+  .question { padding: 14px 0; border-bottom: 1px dashed var(--line); }
+  .question:last-child { border-bottom: none; }
+  .question label.q { display: block; font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .question .hint { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
+  .options { display: flex; flex-wrap: wrap; gap: 6px; }
+  .options input[type="radio"] { display: none; }
+  .options label { display: inline-flex; align-items: center; justify-content: center; padding: 7px 12px; border: 1px solid var(--line-2); background: #fff; color: var(--ink-2); border-radius: 999px; font-size: 13px; cursor: pointer; transition: all 0.15s; user-select: none; }
+  .options label:hover { border-color: var(--v-black); color: var(--v-black); }
+  .options input[type="radio"]:checked + label { background: var(--v-black); border-color: var(--v-black); color: #fff; font-weight: 600; }
+  .actions { display: flex; gap: 10px; margin-top: 14px; }
+  button { font-family: inherit; cursor: pointer; border-radius: 8px; padding: 11px 20px; font-size: 14px; font-weight: 700; border: 1px solid transparent; transition: all 0.15s; letter-spacing: 0.2px; }
+  .btn-primary { background: var(--v-black); color: #fff; border-color: var(--v-black); }
+  .btn-primary:hover { background: var(--v-emerald); border-color: var(--v-emerald); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(43,182,115,0.3); }
+  .btn-ghost { background: #fff; color: var(--ink-2); border-color: var(--line-2); }
+  .btn-ghost:hover { border-color: var(--v-black); color: var(--v-black); }
+  .configure-system { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line-2); }
+  .btn-configure { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; background: var(--v-emerald); color: #fff; border: 1px solid var(--v-emerald); border-radius: 8px; padding: 12px 20px; font-size: 14px; font-weight: 700; letter-spacing: 0.2px; text-decoration: none; transition: all 0.15s; }
+  .btn-configure:hover { background: var(--v-black); border-color: var(--v-black); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .results-empty { padding: 56px 28px; text-align: center; color: var(--ink-3); }
+  .results-empty svg { display: block; margin: 0 auto 14px; }
+  .results-empty p { margin: 0; font-size: 15px; }
+  .recommendation { padding: 18px 20px 8px; }
+  .top-pick { display: flex; align-items: flex-start; gap: 14px; padding: 16px; border-radius: 10px; background: linear-gradient(135deg, #effaf5 0%, #d9f3e6 100%); border: 1px solid var(--v-emerald); margin-bottom: 14px; }
+  .selection-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; background: var(--v-black); color: #fff; margin-bottom: 12px; flex-wrap: wrap; }
+  .selection-bar .sel-text { font-size: 13px; color: #d4d4d4; flex: 1 1 auto; min-width: 160px; }
+  .selection-bar .sel-text strong { color: #fff; font-weight: 700; }
+  .sku-pill { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: var(--v-black); border: 1px solid #fff; border-radius: 999px; padding: 6px 10px 6px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; user-select: all; }
+  .sku-pill:hover { background: var(--v-emerald); border-color: var(--v-emerald); color: #fff; }
+  .sku-pill .sku-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); padding-right: 8px; border-right: 1px solid var(--line); margin-right: 2px; }
+  .sku-pill:hover .sku-label { color: rgba(255,255,255,0.85); border-right-color: rgba(255,255,255,0.4); }
+  .sku-pill .copy-btn { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--v-black); color: #fff; font-size: 12px; }
+  .sku-pill:hover .copy-btn { background: rgba(255,255,255,0.2); }
+  .sku-pill.copied { background: var(--v-emerald); border-color: var(--v-emerald); color: #fff; }
+  .sku-pill.copied .sku-label { color: rgba(255,255,255,0.85); border-right-color: rgba(255,255,255,0.4); }
+  .card-select-hint { font-size: 11px; color: var(--muted); margin-bottom: 14px; text-align: center; font-style: italic; }
+  .card { cursor: pointer; }
+  .card.selected { border-color: var(--v-emerald) !important; box-shadow: 0 0 0 3px rgba(43,182,115,0.25), 0 8px 24px rgba(43,182,115,0.15) !important; }
+  .card.selected .selected-check { display: inline-flex; }
+  .selected-check { display: none; position: absolute; top: 12px; right: 12px; width: 26px; height: 26px; border-radius: 50%; background: var(--v-emerald); color: #fff; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; box-shadow: 0 2px 6px rgba(43,182,115,0.4); }
+  .top-pick-icon { font-size: 20px; line-height: 1; color: var(--v-emerald-dark); }
+  .top-pick-text { font-size: 14px; color: #155a3c; }
+  .top-pick-text strong { color: #0b3d27; font-size: 15px; }
+  .cards { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 760px) { .cards { grid-template-columns: 1fr 1fr; } }
+  .card { border: 1px solid var(--line); border-radius: 10px; padding: 16px; background: #fff; position: relative; transition: all 0.2s; }
+  .card.rank-1 { border-color: var(--v-emerald); box-shadow: 0 0 0 2px rgba(43,182,115,0.2), 0 8px 20px rgba(43,182,115,0.12); }
+  .card.rank-2 { border-color: var(--v-mint); }
+  .card.rank-3 { border-color: var(--line-2); }
+  .card.dimmed { opacity: 0.6; }
+  .rank-badge { position: absolute; top: -10px; left: 14px; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #fff; }
+  .rank-1 .rank-badge { background: var(--v-emerald); }
+  .rank-2 .rank-badge { background: var(--v-emerald-dark); }
+  .rank-3 .rank-badge { background: var(--ink-2); }
+  .rank-other .rank-badge { background: var(--ink-3); }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; padding-top: 4px; }
+  .brand-tag { display: inline-block; padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #fff; text-transform: uppercase; }
+  .brand-tcl { background: var(--tcl); }
+  .brand-samsung { background: var(--samsung); }
+  .brand-sony { background: var(--sony); }
+  .brand-consumer { background: #6b7280; }
+  .series-name { margin: 4px 0 0; font-size: 17px; font-weight: 700; color: var(--ink); }
+  .cost-tier { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; color: var(--good); font-size: 16px; letter-spacing: 1px; }
+  .cost-tier .muted { color: var(--line-2); }
+  .match-bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 8px 0 12px; }
+  .match-fill { height: 100%; background: linear-gradient(90deg, var(--v-mint), var(--v-emerald)); border-radius: 999px; transition: width 0.4s; }
+  .match-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 4px; }
+  .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin: 10px 0; padding: 10px; background: #fafaf7; border-radius: 8px; font-size: 12px; border: 1px solid var(--line); }
+  .spec-row { display: flex; justify-content: space-between; gap: 8px; }
+  .spec-row .k { color: var(--ink-3); }
+  .spec-row .v { color: var(--ink); font-weight: 600; text-align: right; }
+  .app-line { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: 12px; color: var(--ink-2); line-height: 1.5; }
+  .app-line strong { color: var(--ink); }
+  .reasons { margin-top: 10px; }
+  .reason { font-size: 12px; padding: 3px 0; display: flex; gap: 6px; align-items: flex-start; }
+  .reason .dot { flex: 0 0 auto; width: 14px; height: 14px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; color: #fff; font-weight: 700; }
+  .reason.good .dot { background: var(--good); }
+  .reason.warn .dot { background: var(--warn); }
+  .reason.bad  .dot { background: var(--bad); }
+  details.compare { margin-top: 22px; }
+  details.compare summary { cursor: pointer; padding: 10px 14px; background: #fafaf7; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  details.compare summary:hover { color: var(--v-emerald-dark); border-color: var(--v-emerald); }
+  table.compare-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px; }
+  table.compare-table th, table.compare-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  table.compare-table thead th { background: var(--v-black); color: #fff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+  table.compare-table tbody tr:hover { background: #fafaf7; }
+  table.compare-table .num { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  /* Brand logo strip at bottom of right panel */
+  .brand-strip { padding: 18px 20px 22px; border-top: 1px dashed var(--line); }
+  .brand-strip-label { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; text-align: center; }
+  .brand-strip-list { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+  .brand-strip-item { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; justify-content: center; min-height: 64px; transition: all 0.15s; text-decoration: none; color: inherit; cursor: pointer; }
+  .brand-strip-item:hover { border-color: var(--v-emerald); box-shadow: 0 2px 8px rgba(15,38,34,0.06); }
+  .brand-strip-item img { max-height: 38px; max-width: 180px; height: auto; width: auto; display: block; object-fit: contain; }
+
+  footer { text-align: center; padding: 28px 16px; color: var(--ink-3); font-size: 12px; border-top: 1px solid var(--line); margin-top: 24px; background: #fff; }
+  footer .footer-brand { font-weight: 700; color: var(--v-black); }
+  footer .footer-brand .dot { color: var(--v-emerald); }
+</style>
+</head>
+<body>
+<header class="header">
+  <a class="logo" href="https://vistifyinc.com" target="_blank" rel="noopener">
+    <img src="vistify-wordmark.png" alt="Vistify">
+  </a>
+  <div class="divider"></div>
+  <div class="product-name">Commercial&nbsp;Display Brand &amp; Model Selector</div>
+  <a class="back-to-calc" href="dmb-calculator.html" aria-label="Back to Measurement Calculator">
+    <span aria-hidden="true">&larr;</span>&nbsp;Back to Calculator
+  </a>
+</header>
+<div class="subheader">
+  <div class="subheader-inner">For Interior LFD Displays Only. Recommendations based on combination of features, cost, and intended use case.</div>
+</div>
+<main class="container">
+  <div class="layout">
+    <section class="panel" aria-label="Customer Questionnaire">
+      <div class="panel-head"><h2>Customer Profile</h2></div>
+      <div class="panel-body">
+        <div class="question">
+          <label class="q">1. Venue type & viewing angle</label>
+          <div class="hint">Single QSR menu boards are viewed head-on (standard angle). Food / event halls have open layouts that need wide off-axis viewing (IPS).</div>
+          <div class="options" data-q="venue">
+            <input type="radio" name="venue" id="venue-qsr" value="qsr" checked />
+            <label for="venue-qsr">Single QSR · Standard angle</label>
+            <input type="radio" name="venue" id="venue-hall" value="hall" />
+            <label for="venue-hall">Food / Event Hall · Wide angle</label>
+          </div>
+        </div>
+        <div class="question">
+          <label class="q">2. Ambient lighting at the install location</label>
+          <div class="hint">Indoor only. Brighter interior spaces (atria, daylit dining rooms) need higher-NIT panels and a higher-haze (anti-glare) surface to cut reflections. Dim interiors favor lower haze for image clarity.</div>
+          <div class="options" data-q="ambient">
+            <input type="radio" name="ambient" id="amb-min" value="minimal" />
+            <label for="amb-min">Minimal (dim interior)</label>
+            <input type="radio" name="ambient" id="amb-mod" value="moderate" checked />
+            <label for="amb-mod">Moderate (typical retail / lobby)</label>
+            <input type="radio" name="ambient" id="amb-high" value="high" />
+            <label for="amb-high">High (bright atrium / daylit interior)</label>
+          </div>
+        </div>
+        <div class="question">
+          <label class="q">3. Content type</label>
+          <div class="hint">Vivid (food photography, motion, branded marketing) benefits from DCI-P3 gamut.</div>
+          <div class="options" data-q="content">
+            <input type="radio" name="content" id="con-std" value="standard" checked />
+            <label for="con-std">Standard</label>
+            <input type="radio" name="content" id="con-viv" value="vivid" />
+            <label for="con-viv">Vivid</label>
+          </div>
+        </div>
+        <div class="question">
+          <label class="q">4. Operating hours</label>
+          <div class="options" data-q="runtime">
+            <input type="radio" name="runtime" id="rt-16" value="16/7" />
+            <label for="rt-16">Up to 16/7</label>
+            <input type="radio" name="runtime" id="rt-24" value="24/7" checked />
+            <label for="rt-24">24/7</label>
+          </div>
+        </div>
+        <div class="question">
+          <label class="q">5. Deep-black performance</label>
+          <div class="hint">Premium contrast for dim viewing / cinematic content.</div>
+          <div class="options" data-q="deepblack">
+            <input type="radio" name="deepblack" id="db-no" value="no" checked />
+            <label for="db-no">Not critical</label>
+            <input type="radio" name="deepblack" id="db-yes" value="yes" />
+            <label for="db-yes">Important</label>
+          </div>
+        </div>
+        <div class="question">
+          <label class="q">6. Warranty service preference</label>
+          <div class="options" data-q="warranty">
+            <input type="radio" name="warranty" id="war-fast" value="fast" checked />
+            <label for="war-fast">Fast Track Replacement</label>
+            <input type="radio" name="warranty" id="war-onsite" value="onsite" />
+            <label for="war-onsite">OnSite Repair</label>
+            <input type="radio" name="warranty" id="war-any" value="any" />
+            <label for="war-any">No preference</label>
+          </div>
+        </div>
+        <div class="question">
+          <label class="q">7. Built-in SoC media playback required?</label>
+          <div class="hint">Commercial displays with built-in SoC reduce install complexity. Selecting No opens up the Consumer TV + external Minix Player option.</div>
+          <div class="options" data-q="soc">
+            <input type="radio" name="soc" id="soc-yes" value="yes" checked />
+            <label for="soc-yes">Yes (commercial SoC)</label>
+            <input type="radio" name="soc" id="soc-no" value="no" />
+            <label for="soc-no">No (open to external player)</label>
+          </div>
+        </div>
+
+        <div class="question">
+          <label class="q">8. Budget tier</label>
+          <div class="hint">Estimated cost factor from spec sheet. $ is the budget consumer option, $$$$$ is premium.</div>
+          <div class="options" data-q="budget">
+            <input type="radio" name="budget" id="bud-1" value="1" />
+            <label for="bud-1">$</label>
+            <input type="radio" name="budget" id="bud-2" value="2" checked />
+            <label for="bud-2">$$</label>
+            <input type="radio" name="budget" id="bud-3" value="3" />
+            <label for="bud-3">$$$</label>
+            <input type="radio" name="budget" id="bud-4" value="4" />
+            <label for="bud-4">$$$$</label>
+            <input type="radio" name="budget" id="bud-5" value="5" />
+            <label for="bud-5">$$$$$</label>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" id="recommend-btn" type="button">Get Recommendation</button>
+          <button class="btn-ghost" id="reset-btn" type="button">Reset</button>
+        </div>
+        <div class="configure-system">
+          <a class="btn-configure" href="dmb-calculator.html">Configure System</a>
+        </div>
+      </div>
+    </section>
+    <section class="panel" aria-label="Recommendations">
+      <div class="panel-head"><h2>Recommended Displays</h2></div>
+      <div id="results"></div>
+      <div class="brand-strip">
+        <div class="brand-strip-label">Supported Commercial SoC Displays</div>
+        <div class="brand-strip-list">
+          <a class="brand-strip-item" href="https://us.tcl.com/pages/digital-signage" target="_blank" rel="noopener"><img src="brand-tcl.png" alt="TCL" /></a>
+          <a class="brand-strip-item" href="https://pro.sony/ue_US/products/pro-displays" target="_blank" rel="noopener"><img src="sony-logo.png" alt="Sony" /></a>
+          <a class="brand-strip-item" href="https://www.samsung.com/us/business/smart-signage/uhd-4k-signage/qm-series/" target="_blank" rel="noopener"><img src="Samsung-Logo.png" alt="Samsung" /></a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<footer>
+  <div class="footer-brand">Vistify<span class="dot">.</span></div>
+  Commercial Display Selector - Source data: Commercial Screen Selector spec sheet. Cost factor is relative; consult reseller for current pricing.
+  <br/>(c) 2026 Vistify, Inc. Built in Southern California.
+</footer>
+<script>
+const COST_TIER_MAX = 5;
+const DISPLAYS = [
+  { brand:"TCL",     brandClass:"brand-tcl",     series:"TM",   sku:"TCL-TM-",
+    nits:500, gamut:"93% DCI-P3", gamutType:"dci",  runtime:"24/7", panel:"VA",  angle:"Standard",
+    staticContrast:"4000:1", dynContrast:"Mega",       haze:0.25, deepBlack:false,
+    warrantyYears:5, warrantyType:"Fast Track Replacement",
+    application:"Single QSR, Moderate Ambient Lighting, Vivid Content",
+    appVenue:"qsr", appAmbient:"moderate", appContent:"vivid",
+    soc:true,
+    costTier:3 },
+  { brand:"TCL",     brandClass:"brand-tcl",     series:"TB",   sku:"TCL-TB-",
+    nits:400, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"24/7", panel:"VA",  angle:"Standard",
+    staticContrast:"4000:1", dynContrast:"Mega",       haze:0.25, deepBlack:false,
+    warrantyYears:5, warrantyType:"Fast Track Replacement",
+    application:"Single QSR, Moderate Ambient Lighting, Standard Content",
+    appVenue:"qsr", appAmbient:"moderate", appContent:"standard",
+    soc:true,
+    costTier:2 },
+  { brand:"Samsung", brandClass:"brand-samsung", series:"QH",   sku:"SAM-QH-",
+    nits:700, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"24/7", panel:"VA",  angle:"Standard",
+    staticContrast:"4000:1", dynContrast:"Mega",       haze:0.25, deepBlack:false,
+    warrantyYears:3, warrantyType:"OnSite Repair",
+    application:"Single QSR, High Ambient Lighting, Standard Content",
+    appVenue:"qsr", appAmbient:"high", appContent:"standard",
+    soc:true,
+    costTier:4 },
+  { brand:"Samsung", brandClass:"brand-samsung", series:"QM",   sku:"SAM-QM-",
+    nits:500, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"24/7", panel:"VA",  angle:"Standard",
+    staticContrast:"4000:1", dynContrast:"Mega",       haze:0.25, deepBlack:false,
+    warrantyYears:3, warrantyType:"OnSite Repair",
+    application:"Single QSR, Moderate Ambient Lighting, Standard Content",
+    appVenue:"qsr", appAmbient:"moderate", appContent:"standard",
+    soc:true,
+    costTier:3 },
+  { brand:"Samsung", brandClass:"brand-samsung", series:"QB",   sku:"SAM-QB-",
+    nits:350, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"16/7", panel:"VA",  angle:"Standard",
+    staticContrast:"4000:1", dynContrast:"Mega",       haze:0.02, deepBlack:false,
+    warrantyYears:3, warrantyType:"OnSite Repair",
+    application:"Single QSR, Minimal Ambient Lighting, Standard Content",
+    appVenue:"qsr", appAmbient:"minimal", appContent:"standard",
+    soc:true,
+    costTier:2 },
+  { brand:"Sony",    brandClass:"brand-sony",    series:"BZ40", sku:"SON-BZ40-",
+    nits:700, gamut:"92% DCI-P3", gamutType:"dci",  runtime:"24/7", panel:"IPS", angle:"Wide",
+    staticContrast:"1200:1", dynContrast:"600,000:1", haze:0.47, deepBlack:true,
+    warrantyYears:5, warrantyType:"Fast Track Replacement",
+    application:"Food / Event Hall, High Ambient Lighting, Vivid Content",
+    appVenue:"hall", appAmbient:"high", appContent:"vivid",
+    soc:true,
+    costTier:5 },
+  { brand:"Sony",    brandClass:"brand-sony",    series:"BZ35", sku:"SON-BZ35-",
+    nits:550, gamut:"92% DCI-P3", gamutType:"dci",  runtime:"24/7", panel:"IPS", angle:"Wide",
+    staticContrast:"1200:1", dynContrast:"400,000:1", haze:0.25, deepBlack:false,
+    warrantyYears:3, warrantyType:"Fast Track Replacement",
+    application:"Food / Event Hall, Moderate Ambient Lighting, Vivid Content",
+    appVenue:"hall", appAmbient:"moderate", appContent:"vivid",
+    soc:true,
+    costTier:4 },
+  { brand:"Consumer TV", brandClass:"brand-consumer", series:"TV + Minix Player", sku:"vPlayer-",
+    omitSeriesSuffix:true,
+    nits:250, gamut:"87% DCI-P3", gamutType:"dci",  runtime:"8/7", panel:"VA",  angle:"Standard",
+    staticContrast:"4000:1", dynContrast:"Mega",       haze:0.02, deepBlack:false,
+    warrantyYears:1, warrantyType:"Over The Counter",
+    application:"Budget Conscious, Disposable Use",
+    appVenue:"budget", appAmbient:"minimal", appContent:"standard",
+    soc:false,
+    costTier:1 },
+];
+
+// ---------------------------------------------------------------------------
+// Sibling sync — share the selected SKU Prefix with the DMB Calculator page,
+// and read back the calculator's computed SKU body so the SKU pill on this
+// page can show the full combined SKU too. Example:
+//   prefix "TCL-TM-" (selected here) + body "3x55WL" (set by calculator)
+//   = "TCL-TM-3x55WL"  -> displayed on both pages' SKU pills.
+// Storage keys are namespaced under `vistify.*` to avoid collisions.
+// ---------------------------------------------------------------------------
+const SKU_PREFIX_KEY = "vistify.skuPrefix";
+const SKU_PREFIX_NAME_KEY = "vistify.skuPrefixName";
+const SKU_BODY_KEY = "vistify.skuBody";
+const SELECTOR_PREFS_KEY = "vistify.selectorPrefs";
+const RADIO_NAMES = ["venue","ambient","content","runtime","deepblack","warranty","soc","budget"];
+
+function saveSkuPrefix(prefix, displayName) {
+  try {
+    if (prefix && prefix !== "—") {
+      localStorage.setItem(SKU_PREFIX_KEY, prefix);
+      if (displayName) localStorage.setItem(SKU_PREFIX_NAME_KEY, displayName);
+    } else {
+      localStorage.removeItem(SKU_PREFIX_KEY);
+      localStorage.removeItem(SKU_PREFIX_NAME_KEY);
+    }
+  } catch (e) { /* storage unavailable — non-fatal */ }
+  updateSkuPillFromStorage();
+}
+function getSkuBody() {
+  try { return localStorage.getItem(SKU_BODY_KEY) || ""; }
+  catch (e) { return ""; }
+}
+// Re-render the SKU pill so it reflects the current prefix + body combination.
+// When a calculator-computed body exists, the pill shows the full combined SKU
+// and relabels itself "Configuration SKU"; otherwise it stays as "SKU Prefix".
+function updateSkuPillFromStorage() {
+  const valueEl = document.getElementById("sku-value");
+  const labelEl = document.querySelector("#sku-pill .sku-label");
+  if (!valueEl || !labelEl) return; // results not rendered yet
+  const prefix = (function(){ try { return localStorage.getItem(SKU_PREFIX_KEY) || ""; } catch(e){ return ""; }})()
+    || (valueEl.textContent === "—" ? "" : valueEl.textContent);
+  const body = getSkuBody();
+  if (prefix && body) {
+    valueEl.textContent = prefix + body;
+    labelEl.textContent = "Configuration SKU";
+  } else if (prefix) {
+    valueEl.textContent = prefix;
+    labelEl.textContent = "SKU Prefix";
+  } else {
+    valueEl.textContent = "—";
+    labelEl.textContent = "SKU Prefix";
+  }
+}
+// Pick up live updates from the calculator opened in another tab.
+window.addEventListener("storage", function (e) {
+  if (e.key === SKU_BODY_KEY || e.key === SKU_PREFIX_KEY) updateSkuPillFromStorage();
+});
+
+// ---------------------------------------------------------------------------
+// Form-state persistence — the questionnaire on this page resets to defaults
+// every time the user navigates away (it's a static HTML form). Persist the
+// selected radios so coming back to this page restores the prior questionnaire
+// and auto-renders the recommendation, which in turn restores the SKU pill.
+// ---------------------------------------------------------------------------
+function savePrefsToStorage() {
+  try {
+    const out = {};
+    RADIO_NAMES.forEach(name => {
+      const v = val(name);
+      if (v != null) out[name] = v;
+    });
+    localStorage.setItem(SELECTOR_PREFS_KEY, JSON.stringify(out));
+  } catch (e) { /* non-fatal */ }
+}
+function loadPrefsFromStorage() {
+  try {
+    const raw = localStorage.getItem(SELECTOR_PREFS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function applyPrefsToForm(prefs) {
+  if (!prefs) return;
+  RADIO_NAMES.forEach(name => {
+    const v = prefs[name];
+    if (!v) return;
+    const radio = document.querySelector('input[name="' + name + '"][value="' + v + '"]');
+    if (radio) radio.checked = true;
+  });
+}
+function clearAllSelectorState() {
+  try {
+    localStorage.removeItem(SELECTOR_PREFS_KEY);
+    localStorage.removeItem(SKU_PREFIX_KEY);
+    localStorage.removeItem(SKU_PREFIX_NAME_KEY);
+  } catch (e) { /* non-fatal */ }
+}
+
+// Once the DOM is parsed, also reflect any body already saved by a prior visit
+// to the calculator. (Results panel may not exist yet — that's fine; the
+// function is also called after every renderResults() / card click.)
+document.addEventListener("DOMContentLoaded", function () {
+  // 1. Persist on every radio change so navigating away keeps your answers.
+  document.querySelectorAll('input[type="radio"]').forEach(function (r) {
+    r.addEventListener("change", savePrefsToStorage);
+  });
+  // 2. Restore prior questionnaire answers if we have them.
+  const saved = loadPrefsFromStorage();
+  if (saved) {
+    applyPrefsToForm(saved);
+    // Auto-render recommendation so the results panel (and SKU pill) come back.
+    const btn = document.getElementById("recommend-btn");
+    if (btn) btn.click();
+  }
+  // 3. Reflect any SKU body the calculator may have published, even if the
+  //    results panel hasn't rendered yet (no-op in that case).
+  updateSkuPillFromStorage();
+});
+
+function costTierString(tier) {
+  const filled = "$".repeat(tier);
+  const empty = "<span class='muted'>" + "$".repeat(COST_TIER_MAX - tier) + "</span>";
+  return filled + empty;
+}
+function ambientNeedNits(level) {
+  return level === "high" ? 700 : level === "moderate" ? 400 : 300;
+}
+function val(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+
+function scoreDisplay(d, prefs) {
+  let score = 0, max = 0;
+  const reasons = [];
+
+  // Ambient brightness fit — NITs (weight 17) + Haze/anti-glare (weight 8) = 25 total
+  max += 17;
+  const needed = ambientNeedNits(prefs.ambient);
+  if (d.nits >= needed) {
+    score += 17;
+    reasons.push({ kind: "good", text: `${d.nits} NITs handles ${prefs.ambient} ambient lighting` });
+  } else if (d.nits >= needed - 100) {
+    score += 12;
+    reasons.push({ kind: "warn", text: `${d.nits} NITs mostly handles ${prefs.ambient} lighting (slight margin)` });
+  } else if (d.nits >= needed - 200) {
+    score += 8;
+    reasons.push({ kind: "warn", text: `${d.nits} NITs is marginal for ${prefs.ambient} lighting — viable in a value tier` });
+  } else {
+    reasons.push({ kind: "bad",  text: `${d.nits} NITs is below recommended for ${prefs.ambient} lighting` });
+  }
+
+  // Haze / anti-glare fit for the chosen ambient level (weight 8)
+  max += 8;
+  const hazePct = Math.round(d.haze * 100);
+  if (prefs.ambient === "high") {
+    if (d.haze >= 0.40) {
+      score += 8;
+      reasons.push({ kind: "good", text: `${hazePct}% haze cuts reflections in bright ambient lighting` });
+    } else if (d.haze >= 0.25) {
+      score += 5;
+      reasons.push({ kind: "warn", text: `${hazePct}% haze is workable for bright spaces but reflections may show off-axis` });
+    } else {
+      score += 1;
+      reasons.push({ kind: "bad", text: `${hazePct}% haze is too low for bright ambient — reflections likely to wash out content` });
+    }
+  } else if (prefs.ambient === "moderate") {
+    if (d.haze >= 0.15 && d.haze <= 0.35) {
+      score += 8;
+      reasons.push({ kind: "good", text: `${hazePct}% haze balances clarity and glare control for moderate lighting` });
+    } else if (d.haze > 0.35) {
+      score += 5;
+      reasons.push({ kind: "warn", text: `${hazePct}% haze is heavier than needed — image may look slightly softened` });
+    } else {
+      score += 5;
+      reasons.push({ kind: "warn", text: `${hazePct}% haze gives a glossy surface — may show reflections under typical lobby lighting` });
+    }
+  } else { // minimal
+    if (d.haze <= 0.15) {
+      score += 8;
+      reasons.push({ kind: "good", text: `Low haze (${hazePct}%) preserves image clarity in dim interiors` });
+    } else if (d.haze <= 0.30) {
+      score += 6;
+      reasons.push({ kind: "good", text: `${hazePct}% haze is fine for dim interiors` });
+    } else {
+      score += 4;
+      reasons.push({ kind: "warn", text: `${hazePct}% haze is heavier than needed for dim interiors — slight loss of image clarity` });
+    }
+  }
+
+  max += 15;
+  if (prefs.content === "vivid") {
+    if (d.gamutType === "dci") {
+      score += 15;
+      reasons.push({ kind: "good", text: `${d.gamut} gamut for vivid content` });
+    } else {
+      score += 4;
+      reasons.push({ kind: "warn", text: `${d.gamut} is acceptable but DCI-P3 preferred for vivid content` });
+    }
+  } else {
+    score += 15;
+    reasons.push({ kind: "good", text: `${d.gamut} gamut ${d.gamutType === "dci" ? "(exceeds standard-content needs)" : "suits standard content"}` });
+  }
+
+  max += 15;
+  if (prefs.runtime === "24/7") {
+    if (d.runtime === "24/7") {
+      score += 15;
+      reasons.push({ kind: "good", text: `Rated for 24/7 operation` });
+    } else {
+      reasons.push({ kind: "bad", text: `Only rated ${d.runtime} - not suitable for 24/7` });
+    }
+  } else {
+    score += 15;
+    reasons.push({ kind: "good", text: `Runtime rating ${d.runtime} covers 16/7 needs` });
+  }
+
+  max += 10;
+  if (prefs.angle === "wide") {
+    if (d.angle === "Wide") {
+      score += 10;
+      reasons.push({ kind: "good", text: `${d.panel} panel with wide off-axis viewing` });
+    } else {
+      score += 3;
+      reasons.push({ kind: "warn", text: `${d.panel} / ${d.angle} angle - may dim off-axis` });
+    }
+  } else { score += 10; }
+
+  max += 8;
+  if (prefs.deepblack === "yes") {
+    if (d.deepBlack) {
+      score += 8;
+      reasons.push({ kind: "good", text: `Deep Black panel for premium contrast` });
+    } else {
+      reasons.push({ kind: "warn", text: `No Deep Black layer - contrast may not match cinematic expectations` });
+    }
+  } else { score += 8; }
+
+  max += 15;
+  if (prefs.warranty === "any") {
+    score += 15;
+    reasons.push({ kind: "good", text: `${d.warrantyYears}-yr ${d.warrantyType}` });
+  } else if (prefs.warranty === "fast" && d.warrantyType.startsWith("Fast")) {
+    score += 15;
+    reasons.push({ kind: "good", text: `${d.warrantyYears}-yr ${d.warrantyType}` });
+  } else if (prefs.warranty === "onsite" && d.warrantyType.startsWith("OnSite")) {
+    score += 15;
+    reasons.push({ kind: "good", text: `${d.warrantyYears}-yr ${d.warrantyType}` });
+  } else {
+    score += 3;
+    reasons.push({ kind: "warn", text: `Ships with ${d.warrantyType} (preference was different)` });
+  }
+
+  // SoC management (weight 10)
+  max += 10;
+  if (prefs.soc === "yes") {
+    if (d.soc) {
+      score += 10;
+      reasons.push({ kind: "good", text: `Built-in SoC for direct media playback` });
+    } else {
+      reasons.push({ kind: "bad", text: `No built-in SoC — requires external media player` });
+    }
+  } else {
+    score += 10;
+    if (!d.soc) reasons.push({ kind: "good", text: `External media player keeps display cost low` });
+  }
+
+  max += 26;
+  const budget = parseInt(prefs.budget, 10);
+  const diff = d.costTier - budget;
+  if (diff === 0) {
+    score += 26;
+    reasons.push({ kind: "good", text: `Matches ${"$".repeat(budget)} budget exactly (cost tier ${"$".repeat(d.costTier)})` });
+  } else if (diff === -1) {
+    score += 22;
+    reasons.push({ kind: "warn", text: `Below ${"$".repeat(budget)} budget (cost tier ${"$".repeat(d.costTier)}) — value option` });
+  } else if (diff <= -2) {
+    score += 16;
+    reasons.push({ kind: "warn", text: `Well below ${"$".repeat(budget)} budget (cost tier ${"$".repeat(d.costTier)}) — may be under-spec'd` });
+  } else if (diff === 1) {
+    score += 22;
+    reasons.push({ kind: "warn", text: `Slightly over budget (cost tier ${"$".repeat(d.costTier)}) — often acceptable` });
+  } else {
+    reasons.push({ kind: "bad", text: `Over budget (cost tier ${"$".repeat(d.costTier)})` });
+  }
+
+  max += 6;
+  const venueLabel = { qsr: "Single QSR", hall: "Food / Event Hall", budget: "Budget Conscious, Disposable Use" };
+  if (d.appVenue === prefs.venue) {
+    score += 6;
+    reasons.push({ kind: "good", text: `Designed for ${venueLabel[prefs.venue] || prefs.venue} deployments` });
+  } else {
+    score += 2;
+    reasons.push({ kind: "warn", text: `Primary application is ${venueLabel[d.appVenue] || d.appVenue} - usable but cross-applied` });
+  }
+
+  return { score, max, pct: Math.round((score / max) * 100), reasons };
+}
+
+function renderResults(ranked, prefs) {
+  const container = document.getElementById("results");
+  const top = ranked[0];
+
+  let html = `<div class="recommendation">
+    <div class="top-pick">
+      <span class="top-pick-icon">&#9733;</span>
+      <div class="top-pick-text">
+        <strong>${top.d.brand} ${top.d.series}${top.d.omitSeriesSuffix ? "" : " Series"}</strong> is the top match (${top.pct}% fit).
+        ${top.d.application}.
+      </div>
+    </div>
+    <div class="selection-bar" id="selection-bar">
+      <div class="sel-text">Selected: <strong id="sel-name">${top.d.brand} ${top.d.series}${top.d.omitSeriesSuffix ? "" : " Series"}</strong></div>
+      <div class="sku-pill" id="sku-pill" title="Click to copy">
+        <span class="sku-label">SKU Prefix</span>
+        <span id="sku-value">${top.d.sku || "—"}</span>
+        <span class="copy-btn" aria-label="Copy">&#x2398;</span>
+      </div>
+    </div>
+    <div class="card-select-hint">Click any card to confirm or switch your selection.</div>
+    <div class="cards">`;
+
+  ranked.forEach((r, idx) => {
+    const rank = idx + 1;
+    const rankClass = rank === 1 ? "rank-1" : rank === 2 ? "rank-2" : rank === 3 ? "rank-3" : "rank-other";
+    const dimmed = rank > 3 ? "dimmed" : "";
+    const rankLabel = rank === 1 ? "Top Pick" : rank === 2 ? "Strong Alt" : rank === 3 ? "Also Consider" : `#${rank}`;
+    const d = r.d;
+
+    html += `
+      <div class="card ${rankClass} ${dimmed} ${rank === 1 ? "selected" : ""}" data-idx="${idx}" data-sku="${d.sku}" data-name="${d.brand} ${d.series}${d.omitSeriesSuffix ? "" : " Series"}">
+        <span class="rank-badge">${rankLabel}</span>
+        <span class="selected-check">&#10003;</span>
+        <div class="card-head">
+          <div>
+            <span class="brand-tag ${d.brandClass}">${d.brand}</span>
+            <div class="series-name">${d.series}${d.omitSeriesSuffix ? "" : " Series"}</div>
+          </div>
+          <div class="cost-tier">${costTierString(d.costTier)}</div>
+        </div>
+        <div class="match-label"><span>Fit Score</span><span>${r.pct}%</span></div>
+        <div class="match-bar"><div class="match-fill" style="width:${r.pct}%"></div></div>
+        <div class="specs">
+          <div class="spec-row"><span class="k">Brightness</span><span class="v">${d.nits} NITs</span></div>
+          <div class="spec-row"><span class="k">Runtime</span><span class="v">${d.runtime}</span></div>
+          <div class="spec-row"><span class="k">Panel</span><span class="v">${d.panel} / ${d.angle}</span></div>
+          <div class="spec-row"><span class="k">Color Gamut</span><span class="v">${d.gamut}</span></div>
+          <div class="spec-row"><span class="k">Static Contrast</span><span class="v">${d.staticContrast}</span></div>
+          <div class="spec-row"><span class="k">Dynamic Contrast</span><span class="v">${d.dynContrast}</span></div>
+          <div class="spec-row"><span class="k">Haze</span><span class="v">${Math.round(d.haze*100)}%</span></div>
+          <div class="spec-row"><span class="k">Deep Black</span><span class="v">${d.deepBlack ? "Yes" : "No"}</span></div>
+          <div class="spec-row"><span class="k">SoC Mgmt</span><span class="v">${d.soc ? "Yes" : "No"}</span></div>
+          <div class="spec-row"><span class="k">Warranty</span><span class="v">${d.warrantyYears}-yr</span></div>
+          <div class="spec-row"><span class="k">Service</span><span class="v">${d.warrantyType}</span></div>
+        </div>
+        <div class="app-line"><strong>Recommended for:</strong> ${d.application}</div>
+        <div class="reasons">
+          ${r.reasons.map(rs => `
+            <div class="reason ${rs.kind}">
+              <span class="dot">${rs.kind === "good" ? "&#10003;" : rs.kind === "warn" ? "!" : "&times;"}</span>
+              <span>${rs.text}</span>
+            </div>`).join("")}
+        </div>
+      </div>`;
+  });
+
+  html += `</div>`;
+
+  html += `
+    <details class="compare">
+      <summary>Full side-by-side comparison (all 7 series)</summary>
+      <div style="overflow-x:auto">
+        <table class="compare-table">
+          <thead><tr>
+            <th>Series</th><th>NITs</th><th>Gamut</th><th>Runtime</th>
+            <th>Panel</th><th>Angle</th><th>Static&nbsp;C.</th><th>Dyn.&nbsp;C.</th>
+            <th>Haze</th><th>Deep&nbsp;Black</th><th>SoC</th><th>Warranty</th><th>Service</th>
+            <th>Cost</th>
+          </tr></thead>
+          <tbody>
+            ${ranked.map(r => `
+              <tr>
+                <td><span class="brand-tag ${r.d.brandClass}">${r.d.brand}</span> <strong>${r.d.series}</strong></td>
+                <td class="num">${r.d.nits}</td>
+                <td>${r.d.gamut}</td>
+                <td class="num">${r.d.runtime}</td>
+                <td>${r.d.panel}</td>
+                <td>${r.d.angle}</td>
+                <td class="num">${r.d.staticContrast}</td>
+                <td class="num">${r.d.dynContrast}</td>
+                <td class="num">${Math.round(r.d.haze*100)}%</td>
+                <td>${r.d.deepBlack ? "Yes" : "No"}</td>
+                <td>${r.d.soc ? "Yes" : "No"}</td>
+                <td class="num">${r.d.warrantyYears}-yr</td>
+                <td>${r.d.warrantyType}</td>
+                <td class="num">${"$".repeat(r.d.costTier)}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>`;
+
+  container.innerHTML = html;
+
+  // Wire card click → selection update
+  const cards = container.querySelectorAll(".card");
+  const selName = document.getElementById("sel-name");
+  const selSku  = document.getElementById("sku-value");
+
+  // Restore the user's prior selection if one exists; otherwise fall back to
+  // the top pick (which is already marked .selected in the HTML above).
+  let savedPrefix = "";
+  try { savedPrefix = localStorage.getItem(SKU_PREFIX_KEY) || ""; } catch (e) {}
+  let restoredCard = null;
+  if (savedPrefix) {
+    cards.forEach(c => {
+      if (c.getAttribute("data-sku") === savedPrefix) restoredCard = c;
+    });
+  }
+  if (restoredCard) {
+    cards.forEach(c => c.classList.remove("selected"));
+    restoredCard.classList.add("selected");
+    if (selName) selName.textContent = restoredCard.getAttribute("data-name");
+    if (selSku)  selSku.textContent  = restoredCard.getAttribute("data-sku") || "—";
+  } else {
+    // No prior selection — save the top pick as the active prefix.
+    saveSkuPrefix(top.d.sku || "", `${top.d.brand} ${top.d.series}${top.d.omitSeriesSuffix ? "" : " Series"}`);
+  }
+  // Reflect prefix + (calculator-published) body on the SKU pill.
+  updateSkuPillFromStorage();
+
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      cards.forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      const sku  = card.getAttribute("data-sku") || "";
+      const name = card.getAttribute("data-name") || "";
+      if (selName) selName.textContent = name;
+      if (selSku)  selSku.textContent  = sku || "—";
+      // Persist for the sibling calculator page (also re-renders this pill).
+      saveSkuPrefix(sku, name);
+    });
+  });
+
+  // Wire SKU pill → copy to clipboard
+  const pill = document.getElementById("sku-pill");
+  if (pill) {
+    pill.addEventListener("click", async () => {
+      const value = document.getElementById("sku-value").textContent.trim();
+      if (!value || value === "—") return;
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch (e) {
+        const ta = document.createElement("textarea");
+        ta.value = value;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+      pill.classList.add("copied");
+      const label = pill.querySelector(".sku-label");
+      const original = label.textContent;
+      label.textContent = "Copied!";
+      setTimeout(() => {
+        pill.classList.remove("copied");
+        label.textContent = original;
+      }, 1400);
+    });
+  }
+}
+
+function renderEmpty() {
+  document.getElementById("results").innerHTML = `
+    <div class="results-empty">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6">
+        <rect x="2.5" y="4" width="19" height="13" rx="1.5"/>
+        <path d="M8 21h8M12 17v4"/>
+      </svg>
+      <p>Set the customer profile on the left, then press <strong>Get Recommendation</strong>.</p>
+    </div>`;
+}
+
+function getPrefs() {
+  const venue = val("venue");
+  return {
+    venue:     venue,
+    ambient:   val("ambient"),
+    content:   val("content"),
+    runtime:   val("runtime"),
+    angle:     venue === "hall" ? "wide" : "standard",
+    deepblack: val("deepblack"),
+    soc:       val("soc"),
+    warranty:  val("warranty"),
+    budget:    val("budget"),
+  };
+}
+
+document.getElementById("recommend-btn").addEventListener("click", () => {
+  const prefs = getPrefs();
+  // Persist the questionnaire so navigation away/back keeps the user's answers.
+  savePrefsToStorage();
+  const ranked = DISPLAYS
+    .map(d => ({ d, ...scoreDisplay(d, prefs) }))
+    .sort((a, b) => b.pct - a.pct || a.d.costTier - b.d.costTier);
+  renderResults(ranked, prefs);
+});
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+  document.getElementById("venue-qsr").checked = true;
+  document.getElementById("amb-mod").checked = true;
+  document.getElementById("con-std").checked = true;
+  document.getElementById("rt-24").checked = true;
+  document.getElementById("db-no").checked = true;
+  document.getElementById("war-fast").checked = true;
+  document.getElementById("soc-yes").checked = true;
+  document.getElementById("bud-2").checked = true;
+  // Wipe persisted questionnaire + prefix; user is starting over.
+  clearAllSelectorState();
+  renderEmpty();
+});
+
+renderEmpty();
+</script>
+</body>
+</html>
