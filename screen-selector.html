@@ -232,6 +232,36 @@
   footer { text-align: center; padding: 28px 16px; color: var(--ink-3); font-size: 12px; border-top: 1px solid var(--line); margin-top: 24px; background: #fff; }
   footer .footer-brand { font-weight: 700; color: var(--v-black); }
   footer .footer-brand .dot { color: var(--v-emerald); }
+
+  /* Copy summary / Print buttons (mirror of dmb-calculator footer actions) */
+  .copy-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .copy-row button { flex: 1 1 0; min-width: 0; padding: 11px 16px; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--line-2); background: #fff; color: var(--ink-2); font-family: inherit; }
+  .copy-row button:hover { border-color: var(--v-black); color: var(--v-black); }
+  .copy-row button.primary { background: var(--v-black); color: #fff; border-color: var(--v-black); }
+  .copy-row button.primary:hover { background: var(--v-emerald); border-color: var(--v-emerald); box-shadow: 0 4px 12px rgba(43,182,115,0.3); transform: translateY(-1px); }
+
+  /* Print summary — clean printable view that combines selector + calculator. */
+  @media screen { #print-area { display: none !important; } }
+  @media print {
+    body > *:not(#print-area) { display: none !important; }
+    #print-area { display: block !important; padding: 0; margin: 0; }
+    .print-doc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #0A0A0A; padding: 32px 36px; max-width: 7.5in; margin: 0 auto; }
+    .print-doc .print-header { display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #0A0A0A; padding-bottom: 12px; margin-bottom: 18px; }
+    .print-doc .print-header img { height: 28px; width: auto; }
+    .print-doc .print-header .print-title { font-size: 16px; font-weight: 700; letter-spacing: 0.4px; }
+    .print-doc .print-header .print-date { margin-left: auto; font-size: 11px; color: #555; }
+    .print-block { page-break-inside: avoid; margin-bottom: 22px; }
+    .print-block h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0A0A0A; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin: 16px 0 10px; }
+    .print-block h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #444; margin: 12px 0 6px; }
+    .print-kv { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .print-kv td { padding: 4px 6px; vertical-align: top; border-bottom: 1px dotted #ddd; }
+    .print-kv td:first-child { color: #555; width: 38%; }
+    .print-kv td:last-child { font-weight: 600; }
+    .print-kv td .sku { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace; letter-spacing: 0.5px; }
+    .print-missing { font-size: 11px; color: #888; font-style: italic; padding: 8px 0; }
+    .print-footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 10px; color: #777; }
+    @page { margin: 0.5in; }
+  }
 </style>
 </head>
 <body>
@@ -349,6 +379,10 @@
         <div class="configure-system">
           <a class="btn-configure" href="dmb-calculator.html">Configure System</a>
         </div>
+        <div class="copy-row">
+          <button type="button" class="primary" id="copyBtn" onclick="copySummary()">Copy summary</button>
+          <button type="button" onclick="printSummary()">Print</button>
+        </div>
       </div>
     </section>
     <section class="panel" aria-label="Recommendations">
@@ -452,7 +486,31 @@ const SKU_PREFIX_KEY = "vistify.skuPrefix";
 const SKU_PREFIX_NAME_KEY = "vistify.skuPrefixName";
 const SKU_BODY_KEY = "vistify.skuBody";
 const SELECTOR_PREFS_KEY = "vistify.selectorPrefs";
+const SELECTOR_SUMMARY_KEY = "vistify.selectorSummary";
+const CALC_SUMMARY_KEY = "vistify.calcSummary";
 const RADIO_NAMES = ["venue","ambient","content","runtime","deepblack","warranty","soc","budget"];
+
+// Pretty labels for the customer-profile answers.
+const PROFILE_LABELS = {
+  venue:     { q: "Venue",            map: { qsr:"Single QSR (standard angle)", hall:"Food / Event Hall (wide angle)" }},
+  ambient:   { q: "Ambient lighting", map: { minimal:"Minimal (dim interior)", moderate:"Moderate (retail / lobby)", high:"High (bright atrium)" }},
+  content:   { q: "Content type",     map: { standard:"Standard", vivid:"Vivid (food / motion / branded)" }},
+  runtime:   { q: "Operating hours",  map: { "16/7":"Up to 16/7", "24/7":"24/7" }},
+  deepblack: { q: "Deep-black perf.", map: { no:"Not critical", yes:"Important" }},
+  warranty:  { q: "Warranty service", map: { fast:"Fast Track Replacement", onsite:"OnSite Repair", any:"No preference" }},
+  soc:       { q: "Built-in SoC",     map: { yes:"Yes (commercial SoC)", no:"No (open to external player)" }},
+  budget:    { q: "Budget tier",      map: { "1":"$", "2":"$$", "3":"$$$", "4":"$$$$", "5":"$$$$$" }}
+};
+
+// HTML escape so user-entered or display-name values can't break print markup.
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function kvRow(label, value) {
+  return "<tr><td>" + esc(label) + "</td><td>" + value + "</td></tr>";
+}
 
 function saveSkuPrefix(prefix, displayName) {
   try {
@@ -465,6 +523,9 @@ function saveSkuPrefix(prefix, displayName) {
     }
   } catch (e) { /* storage unavailable — non-fatal */ }
   updateSkuPillFromStorage();
+  // Refresh the printable/copyable summary so the calculator's Copy/Print
+  // can pull it in.
+  try { saveSelectorSummaryToStorage(); } catch (e) {}
 }
 function getSkuBody() {
   try { return localStorage.getItem(SKU_BODY_KEY) || ""; }
@@ -511,6 +572,8 @@ function savePrefsToStorage() {
     });
     localStorage.setItem(SELECTOR_PREFS_KEY, JSON.stringify(out));
   } catch (e) { /* non-fatal */ }
+  // Customer-profile answers feed the printable summary too.
+  try { saveSelectorSummaryToStorage(); } catch (e) {}
 }
 function loadPrefsFromStorage() {
   try {
@@ -532,7 +595,203 @@ function clearAllSelectorState() {
     localStorage.removeItem(SELECTOR_PREFS_KEY);
     localStorage.removeItem(SKU_PREFIX_KEY);
     localStorage.removeItem(SKU_PREFIX_NAME_KEY);
+    localStorage.removeItem(SELECTOR_SUMMARY_KEY);
   } catch (e) { /* non-fatal */ }
+}
+
+// ---------------------------------------------------------------------------
+// Summary — build a plain-text + HTML summary of the current screen-selector
+// state (selected display + customer profile answers). Persisted to storage
+// so the Calculator's Copy Summary / Print can include it.
+// ---------------------------------------------------------------------------
+function findDisplayBySku(prefix) {
+  if (!prefix) return null;
+  for (let i = 0; i < DISPLAYS.length; i++) {
+    if (DISPLAYS[i].sku === prefix) return DISPLAYS[i];
+  }
+  return null;
+}
+function buildSelectorSummary() {
+  let prefix = ""; let name = "";
+  try {
+    prefix = localStorage.getItem(SKU_PREFIX_KEY) || "";
+    name   = localStorage.getItem(SKU_PREFIX_NAME_KEY) || "";
+  } catch (e) {}
+  const d = findDisplayBySku(prefix);
+  const prefs = loadPrefsFromStorage() || (function(){
+    // If nothing's stored yet, read live form values so live state is captured.
+    const out = {};
+    RADIO_NAMES.forEach(name => { const v = val(name); if (v != null) out[name] = v; });
+    return out;
+  })();
+
+  // ---- Plain text version ----
+  const tLines = [
+    "Vistify Commercial Display — Selection Summary",
+    "----------------------------------------------------"
+  ];
+  if (prefix) {
+    tLines.push("Brand & Model:     " + (name || (d ? (d.brand + " " + d.series) : "Display")));
+    tLines.push("SKU Prefix:        " + prefix);
+  } else {
+    tLines.push("Brand & Model:     (none chosen yet)");
+  }
+  if (d) {
+    tLines.push("Brightness:        " + d.nits + " NITs");
+    tLines.push("Color gamut:       " + d.gamut);
+    tLines.push("Runtime:           " + d.runtime);
+    tLines.push("Panel / Angle:     " + d.panel + " / " + d.angle);
+    tLines.push("Static contrast:   " + d.staticContrast);
+    tLines.push("Dynamic contrast:  " + d.dynContrast);
+    tLines.push("Haze (anti-glare): " + Math.round(d.haze*100) + "%");
+    tLines.push("Deep-black:        " + (d.deepBlack ? "Yes" : "No"));
+    tLines.push("Built-in SoC:      " + (d.soc ? "Yes" : "No"));
+    tLines.push("Warranty:          " + d.warrantyYears + "-yr (" + d.warrantyType + ")");
+    tLines.push("Cost tier:         " + "$".repeat(d.costTier));
+    tLines.push("Application:       " + d.application);
+  }
+  if (prefs && Object.keys(prefs).length) {
+    tLines.push("");
+    tLines.push("Customer Profile");
+    tLines.push("----------------");
+    RADIO_NAMES.forEach(key => {
+      const meta = PROFILE_LABELS[key];
+      const v = prefs[key];
+      if (!meta || !v) return;
+      const human = (meta.map && meta.map[v]) || v;
+      tLines.push((meta.q + ":").padEnd(19) + human);
+    });
+  }
+  const text = tLines.join("\n");
+
+  // ---- HTML version ----
+  let rows = "";
+  if (prefix) {
+    rows += kvRow("Brand & Model", esc(name || (d ? (d.brand + " " + d.series) : "Display")));
+    rows += kvRow("SKU Prefix", '<span class="sku">' + esc(prefix) + '</span>');
+  } else {
+    rows += kvRow("Brand & Model", "<em>(none chosen yet)</em>");
+  }
+  if (d) {
+    rows += kvRow("Brightness", esc(d.nits) + " NITs");
+    rows += kvRow("Color gamut", esc(d.gamut));
+    rows += kvRow("Runtime", esc(d.runtime));
+    rows += kvRow("Panel / Angle", esc(d.panel) + " / " + esc(d.angle));
+    rows += kvRow("Static contrast", esc(d.staticContrast));
+    rows += kvRow("Dynamic contrast", esc(d.dynContrast));
+    rows += kvRow("Haze (anti-glare)", Math.round(d.haze*100) + "%");
+    rows += kvRow("Deep-black perf.", d.deepBlack ? "Yes" : "No");
+    rows += kvRow("Built-in SoC", d.soc ? "Yes" : "No");
+    rows += kvRow("Warranty", esc(d.warrantyYears) + "-yr (" + esc(d.warrantyType) + ")");
+    rows += kvRow("Cost tier", "$".repeat(d.costTier));
+    rows += kvRow("Recommended use", esc(d.application));
+  }
+  let profileRows = "";
+  if (prefs && Object.keys(prefs).length) {
+    RADIO_NAMES.forEach(key => {
+      const meta = PROFILE_LABELS[key];
+      const v = prefs[key];
+      if (!meta || !v) return;
+      profileRows += kvRow(meta.q, esc((meta.map && meta.map[v]) || v));
+    });
+  }
+  let html =
+    '<section class="print-block">' +
+      '<h2>Display Selection (Screen Selector)</h2>' +
+      '<table class="print-kv"><tbody>' + rows + '</tbody></table>';
+  if (profileRows) {
+    html += '<h3>Customer Profile</h3>' +
+            '<table class="print-kv"><tbody>' + profileRows + '</tbody></table>';
+  }
+  html += '</section>';
+
+  return { text: text, html: html };
+}
+
+function saveSelectorSummaryToStorage() {
+  try { localStorage.setItem(SELECTOR_SUMMARY_KEY, JSON.stringify(buildSelectorSummary())); }
+  catch (e) { /* non-fatal */ }
+}
+// The calculator caches a prefix-INDEPENDENT raw summary (skuBody, bodyText,
+// bodyRows). We render the final text + HTML here using the live SKU prefix
+// so the calculator section reflects the user's CURRENT display selection,
+// not the prefix that was active the last time the calculator computed.
+function loadCalcSummary() {
+  let raw = null;
+  try {
+    const json = localStorage.getItem(CALC_SUMMARY_KEY);
+    raw = json ? JSON.parse(json) : null;
+  } catch (e) { return null; }
+  if (!raw || raw.skuBody == null) return null;
+  let prefix = "", prefixName = "";
+  try {
+    prefix = localStorage.getItem(SKU_PREFIX_KEY) || "";
+    prefixName = localStorage.getItem(SKU_PREFIX_NAME_KEY) || "";
+  } catch (e) {}
+  const fullSku = prefix + raw.skuBody;
+  const headerLines = [
+    "Vistify Digital Menu Board — Configuration Summary",
+    "----------------------------------------------------",
+    "Configuration SKU: " + fullSku
+  ];
+  if (prefix) headerLines.push("Display selection: " + (prefixName || "See Screen Selector") + " (prefix " + prefix + ")");
+  let headerRows = "";
+  headerRows += kvRow("Configuration SKU", '<span class="sku">' + esc(fullSku) + '</span>');
+  if (prefix) headerRows += kvRow("Display selection", esc(prefixName || "See Screen Selector") + ' <span class="sku">(' + esc(prefix) + ')</span>');
+  const text = headerLines.join("\n") + "\n" + (raw.bodyText || "");
+  const html =
+    '<section class="print-block">' +
+      '<h2>Configuration (Measurement Calculator)</h2>' +
+      '<table class="print-kv"><tbody>' + headerRows + (raw.bodyRows || "") + '</tbody></table>' +
+    '</section>';
+  return { text: text, html: html };
+}
+
+function copySummary() {
+  // Always rebuild fresh from current state, then append calculator summary.
+  saveSelectorSummaryToStorage();
+  const my = buildSelectorSummary();
+  const sib = loadCalcSummary();
+  let text = my.text;
+  if (sib && sib.text) {
+    text = sib.text + "\n\n" + text;
+  } else {
+    text += "\n\n(No calculator configuration saved yet — open the Measurement Calculator to add one.)";
+  }
+  navigator.clipboard.writeText(text).then(function () {
+    const btn = document.getElementById("copyBtn");
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = "Copied ✓";
+    setTimeout(function () { btn.textContent = orig; }, 1600);
+  });
+}
+
+function printSummary() {
+  saveSelectorSummaryToStorage();
+  const my = buildSelectorSummary();
+  const sib = loadCalcSummary();
+  const dateStr = new Date().toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" });
+  const area = document.getElementById("print-area");
+  if (!area) { window.print(); return; }
+  let body = '<div class="print-doc">' +
+    '<div class="print-header">' +
+      '<img src="vistify-wordmark.png" alt="Vistify">' +
+      '<div class="print-title">Digital Menu Board — Sales Summary</div>' +
+      '<div class="print-date">' + esc(dateStr) + '</div>' +
+    '</div>';
+  if (sib && sib.html) {
+    body += sib.html;
+  } else {
+    body += '<section class="print-block"><h2>Configuration (Measurement Calculator)</h2>' +
+            '<div class="print-missing">No calculator configuration saved yet — open the Measurement Calculator page to size the array.</div>' +
+            '</section>';
+  }
+  body += my.html +
+          '<div class="print-footer">Generated by the Vistify Digital Menu Board Sales Tool.</div>' +
+          '</div>';
+  area.innerHTML = body;
+  window.print();
 }
 
 // Once the DOM is parsed, also reflect any body already saved by a prior visit
@@ -962,5 +1221,7 @@ document.getElementById("reset-btn").addEventListener("click", () => {
 
 renderEmpty();
 </script>
+<!-- Print-only summary; populated by printSummary() and hidden on screen. -->
+<div id="print-area" aria-hidden="true"></div>
 </body>
 </html>
