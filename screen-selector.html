@@ -393,37 +393,40 @@
             <div class="caption">Ambient-lighting reference &middot; Minimal / Moderate / High</div>
           </div>
         </div>
-        <div class="question">
-          <label class="q">3. Content type</label>
-          <div class="hint">Vivid (food photography, motion, branded marketing) benefits from DCI-P3 gamut.</div>
+        <div class="question has-guide">
+          <label class="q">3. Content type <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <div class="hint">Vivid (food photography, motion, branded marketing) benefits from DCI-P3 gamut. Deep Black adds a dedicated low-reflectance layer for cinematic / dim-viewing content.</div>
           <div class="options" data-q="content">
             <input type="radio" name="content" id="con-std" value="standard" checked />
             <label for="con-std">Standard</label>
             <input type="radio" name="content" id="con-viv" value="vivid" />
             <label for="con-viv">Vivid</label>
+            <input type="radio" name="content" id="con-deep" value="deepblack" />
+            <label for="con-deep">Deep Black</label>
+          </div>
+          <div class="guide-popover" role="img" aria-label="Color gamut reference: DCI-P3 vs. NTSC">
+            <img src="assets/guides/color-gamut.jpg" srcset="assets/guides/color-gamut.jpg 1x, assets/guides/color-gamut@2x.jpg 2x" alt="Content type comparison — DCI-P3 (wider color gamut, more vivid) vs. NTSC (narrower gamut, less impact)" loading="lazy" />
+            <div class="caption">Color-gamut reference &middot; DCI-P3 vs. NTSC</div>
           </div>
         </div>
-        <div class="question">
-          <label class="q">4. Operating hours</label>
+        <div class="question has-guide">
+          <label class="q">4. Operating hours <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <div class="hint">How many hours per day will the display run? Commercial 24/7-rated panels resist burn-in and last longer under continuous load; lighter-use installs can use less-rated displays at lower cost.</div>
           <div class="options" data-q="runtime">
+            <input type="radio" name="runtime" id="rt-min" value="minimal" />
+            <label for="rt-min">Minimal use</label>
             <input type="radio" name="runtime" id="rt-16" value="16/7" />
             <label for="rt-16">Up to 16/7</label>
             <input type="radio" name="runtime" id="rt-24" value="24/7" checked />
             <label for="rt-24">24/7</label>
           </div>
-        </div>
-        <div class="question">
-          <label class="q">5. Deep-black performance</label>
-          <div class="hint">Premium contrast for dim viewing / cinematic content.</div>
-          <div class="options" data-q="deepblack">
-            <input type="radio" name="deepblack" id="db-no" value="no" checked />
-            <label for="db-no">Not critical</label>
-            <input type="radio" name="deepblack" id="db-yes" value="yes" />
-            <label for="db-yes">Important</label>
+          <div class="guide-popover" role="img" aria-label="Operating hours reference: Minimal use, Up to 16/7, 24/7">
+            <img src="assets/guides/operating-hours.jpg" srcset="assets/guides/operating-hours.jpg 1x, assets/guides/operating-hours@2x.jpg 2x" alt="Operating hours comparison — Minimal use vs. Up to 16/7 vs. 24/7 continuous duty cycles" loading="lazy" />
+            <div class="caption">Operating-hours reference &middot; Minimal / 16/7 / 24/7</div>
           </div>
         </div>
         <div class="question">
-          <label class="q">6. Warranty service preference</label>
+          <label class="q">5. Warranty service preference</label>
           <div class="options" data-q="warranty">
             <input type="radio" name="warranty" id="war-fast" value="fast" checked />
             <label for="war-fast">Fast Track Replacement</label>
@@ -434,7 +437,7 @@
           </div>
         </div>
         <div class="question">
-          <label class="q">7. Built-in SoC media playback required?</label>
+          <label class="q">6. Built-in SoC with Device Management required?</label>
           <div class="hint">Commercial displays with built-in SoC reduce install complexity. Selecting No opens up the Consumer TV +VPlayer option.</div>
           <div class="options" data-q="soc">
             <input type="radio" name="soc" id="soc-yes" value="yes" checked />
@@ -445,7 +448,7 @@
         </div>
 
         <div class="question">
-          <label class="q">8. Budget tier</label>
+          <label class="q">7. Budget tier</label>
           <div class="hint">Estimated cost factor from spec sheet. $ is the budget consumer option, $$$$$ is premium.</div>
           <div class="options" data-q="budget">
             <input type="radio" name="budget" id="bud-1" value="1" />
@@ -584,15 +587,14 @@ const SKU_BODY_KEY = "vistify.skuBody";
 const SELECTOR_PREFS_KEY = "vistify.selectorPrefs";
 const SELECTOR_SUMMARY_KEY = "vistify.selectorSummary";
 const CALC_SUMMARY_KEY = "vistify.calcSummary";
-const RADIO_NAMES = ["venue","ambient","content","runtime","deepblack","warranty","soc","budget"];
+const RADIO_NAMES = ["venue","ambient","content","runtime","warranty","soc","budget"];
 
 // Pretty labels for the customer-profile answers.
 const PROFILE_LABELS = {
   venue:     { q: "Venue",            map: { qsr:"Single QSR (standard angle)", hall:"Food / Event Hall (wide angle)" }},
   ambient:   { q: "Ambient lighting", map: { minimal:"Minimal (dim interior)", moderate:"Moderate (retail / lobby)", high:"High (bright atrium)" }},
-  content:   { q: "Content type",     map: { standard:"Standard", vivid:"Vivid (food / motion / branded)" }},
-  runtime:   { q: "Operating hours",  map: { "16/7":"Up to 16/7", "24/7":"24/7" }},
-  deepblack: { q: "Deep-black perf.", map: { no:"Not critical", yes:"Important" }},
+  content:   { q: "Content type",     map: { standard:"Standard", vivid:"Vivid (food / motion / branded)", deepblack:"Deep Black (cinematic / dim viewing)" }},
+  runtime:   { q: "Operating hours",  map: { "minimal":"Minimal use", "16/7":"Up to 16/7", "24/7":"24/7" }},
   warranty:  { q: "Warranty service", map: { fast:"Fast Track Replacement", onsite:"OnSite Repair", any:"No preference" }},
   soc:       { q: "Built-in SoC",     map: { yes:"Yes (commercial SoC)", no:"No (open to external player)" }},
   budget:    { q: "Budget tier",      map: { "1":"$", "2":"$$", "3":"$$$", "4":"$$$$", "5":"$$$$$" }}
@@ -982,31 +984,61 @@ function scoreDisplay(d, prefs) {
     }
   }
 
-  max += 15;
-  if (prefs.content === "vivid") {
+  // Combined content-type fit (gamut + deep-black layer), weight 23.
+  // The user picks ONE of Standard / Vivid / Deep Black; partial credit is
+  // given to vivid-rated displays when Deep Black is requested but the
+  // display lacks a dedicated deep-black layer.
+  max += 23;
+  if (prefs.content === "deepblack") {
+    if (d.deepBlack) {
+      score += 23;
+      reasons.push({ kind: "good", text: `Dedicated deep-black layer + ${d.gamut} for cinematic content` });
+    } else if (d.appContent === "vivid") {
+      score += 14; // ~60% partial — vivid-rated panels handle deep-black-leaning content well, just no dedicated layer
+      reasons.push({ kind: "warn", text: `${d.gamut} vivid panel (no dedicated deep-black layer — partial credit)` });
+    } else if (d.gamutType === "dci") {
+      score += 8;
+      reasons.push({ kind: "warn", text: `${d.gamut} gamut but standard-rated panel — limited deep-black performance` });
+    } else {
+      score += 3;
+      reasons.push({ kind: "bad", text: `Standard panel + ${d.gamut} — won't deliver cinematic deep blacks` });
+    }
+  } else if (prefs.content === "vivid") {
     if (d.gamutType === "dci") {
-      score += 15;
+      score += 23;
       reasons.push({ kind: "good", text: `${d.gamut} gamut for vivid content` });
     } else {
-      score += 4;
+      score += 8;
       reasons.push({ kind: "warn", text: `${d.gamut} is acceptable but DCI-P3 preferred for vivid content` });
     }
-  } else {
-    score += 15;
+  } else { // standard
+    score += 23;
     reasons.push({ kind: "good", text: `${d.gamut} gamut ${d.gamutType === "dci" ? "(exceeds standard-content needs)" : "suits standard content"}` });
   }
 
+  // Runtime fit (weight 15). Three preference levels — 24/7, 16/7, minimal —
+  // scored against each display's rated duty cycle. A display rated higher
+  // than the user needs is fine (and earns full credit); a display rated
+  // lower gets partial or no credit depending on how undersized it is.
   max += 15;
   if (prefs.runtime === "24/7") {
     if (d.runtime === "24/7") {
       score += 15;
       reasons.push({ kind: "good", text: `Rated for 24/7 operation` });
     } else {
-      reasons.push({ kind: "bad", text: `Only rated ${d.runtime} - not suitable for 24/7` });
+      reasons.push({ kind: "bad", text: `Only rated ${d.runtime} — not suitable for 24/7` });
     }
-  } else {
+  } else if (prefs.runtime === "16/7") {
+    if (d.runtime === "24/7" || d.runtime === "16/7") {
+      score += 15;
+      reasons.push({ kind: "good", text: `Runtime rating ${d.runtime} covers 16/7 needs` });
+    } else {
+      score += 5;
+      reasons.push({ kind: "warn", text: `Only rated ${d.runtime} — may not survive 16/7 daily use` });
+    }
+  } else { // minimal
     score += 15;
-    reasons.push({ kind: "good", text: `Runtime rating ${d.runtime} covers 16/7 needs` });
+    reasons.push({ kind: "good", text: `Runtime rating ${d.runtime} covers minimal-use needs` });
   }
 
   max += 10;
@@ -1019,16 +1051,6 @@ function scoreDisplay(d, prefs) {
       reasons.push({ kind: "warn", text: `${d.panel} / ${d.angle} angle - may dim off-axis` });
     }
   } else { score += 10; }
-
-  max += 8;
-  if (prefs.deepblack === "yes") {
-    if (d.deepBlack) {
-      score += 8;
-      reasons.push({ kind: "good", text: `Deep Black panel for premium contrast` });
-    } else {
-      reasons.push({ kind: "warn", text: `No Deep Black layer - contrast may not match cinematic expectations` });
-    }
-  } else { score += 8; }
 
   max += 15;
   if (prefs.warranty === "any") {
@@ -1294,7 +1316,6 @@ function getPrefs() {
     content:   val("content"),
     runtime:   val("runtime"),
     angle:     venue === "hall" ? "wide" : "standard",
-    deepblack: val("deepblack"),
     soc:       val("soc"),
     warranty:  val("warranty"),
     budget:    val("budget"),
@@ -1316,7 +1337,6 @@ document.getElementById("reset-btn").addEventListener("click", () => {
   document.getElementById("amb-mod").checked = true;
   document.getElementById("con-std").checked = true;
   document.getElementById("rt-24").checked = true;
-  document.getElementById("db-no").checked = true;
   document.getElementById("war-fast").checked = true;
   document.getElementById("soc-yes").checked = true;
   document.getElementById("bud-2").checked = true;
