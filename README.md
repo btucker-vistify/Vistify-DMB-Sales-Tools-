@@ -112,25 +112,49 @@ GitHub Pages will serve `index.html` at the root URL, which forwards to
 ├── index.html                 # GitHub Pages entry — redirects to dmb-calculator.html
 ├── dmb-calculator.html        # Measurement Calculator (canonical)
 ├── screen-selector.html       # Brand & Model Selector
-├── vistify-wordmark.png       # Vistify wordmark used in both page headers
-├── brand-tcl.png              # Brand strip logos used in the screen selector
-├── Samsung-Logo.png
-├── sony-logo.png
-├── Concept Files/             # Source spec sheets and original concept assets
+├── favicon.ico                # Kept at root for browser auto-discovery
+├── assets/
+│   ├── brand/
+│   │   ├── vistify-wordmark.png  # Header wordmark on every page
+│   │   ├── tcl-logo.png          # Brand strip logos (selector page)
+│   │   ├── samsung-logo.png
+│   │   └── sony-logo.png
+│   ├── favicon/                  # All non-root favicon sizes + apple-touch-icon
+│   │   ├── favicon-16.png
+│   │   ├── favicon-32.png
+│   │   ├── favicon-48.png
+│   │   ├── favicon-192.png
+│   │   ├── favicon-512.png
+│   │   └── apple-touch-icon.png
+│   ├── displays/                 # Optimized product-shot thumbnails (cards)
+│   │   ├── tcl-screen.jpg + tcl-screen@2x.jpg
+│   │   ├── samsung-screen.jpg + samsung-screen@2x.jpg
+│   │   ├── sony-screen.jpg + sony-screen@2x.jpg
+│   │   └── consumer-screen.jpg + consumer-screen@2x.jpg
+│   └── guides/                   # Hover-popover reference illustrations
+│       ├── viewing-angle.jpg + viewing-angle@2x.jpg
+│       └── ambient-lighting.jpg + ambient-lighting@2x.jpg
+├── concept-files/             # Source spec sheets and original concept assets
 │   ├── Commercial Screen Selector.xlsx
 │   ├── Copy of Vistify Digital Menu Board Measurement Calculator Tools.xlsx
 │   ├── Strong Mount Pole Accessories.xlsx
 │   ├── Ceiling Mount Required Measurements.pdf
-│   ├── V Wordmark Color Logo_B_TM.png
-│   └── VLogo.jpg
+│   ├── V-Logo_Color.png       # Source for the favicon set
+│   ├── Samsung screen.jpg     # Original sources for the display thumbnails
+│   ├── Sony screen.jpg
+│   ├── TCL screen.png
+│   ├── minix.jpg              # Source for the Consumer TV + VPlayer thumbnail
+│   ├── Viewing Angle.png      # Source for the Q1 hover popover
+│   └── Ambient Lighting.png   # Source for the Q2 hover popover
 ├── .gitignore
 ├── .nojekyll
 └── README.md
 ```
 
-`Concept Files/` is kept in the repository as a reference for future edits
-(the calculator's pole-selection logic, brand-spec scoring, and ceiling
-clearance math are all sourced from those spreadsheets and the PDF).
+`concept-files/` is kept in the repository as the source-of-truth for the
+spec sheets that drive the calculator's pole-selection logic, brand-spec
+scoring, and ceiling-clearance math — and the original high-resolution
+images the optimized thumbnails in `assets/` are generated from.
 
 ## License & ownership
 

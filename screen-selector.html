@@ -4,6 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Vistify - Commercial Display Brand & Model Selector</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512.png">
+<meta name="theme-color" content="#2BB673">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -130,14 +137,79 @@
   main { padding: 32px 0 56px; }
   .layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
   @media (min-width: 980px) { .layout { grid-template-columns: 380px 1fr; } }
-  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(15,38,34,0.04), 0 4px 16px rgba(15,38,34,0.05); overflow: hidden; }
-  .panel-head { padding: 18px 22px; border-bottom: 1px solid var(--line); background: #ffffff; display: flex; align-items: center; gap: 10px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(15,38,34,0.04), 0 4px 16px rgba(15,38,34,0.05); /* overflow:visible so hover popovers can escape; head/foot keep rounded look via their own backgrounds matching panel */ }
+  .panel-head { padding: 18px 22px; border-bottom: 1px solid var(--line); background: #ffffff; display: flex; align-items: center; gap: 10px; border-radius: 16px 16px 0 0; }
   .panel-head::before { content: ""; width: 24px; height: 24px; background: var(--v-emerald); border-radius: 50%; flex: 0 0 auto; }
   .panel-head h2 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); text-transform: none; }
   .panel-body { padding: 16px 20px 22px; }
   .question { padding: 14px 0; border-bottom: 1px dashed var(--line); }
   .question:last-child { border-bottom: none; }
   .question label.q { display: block; font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+
+  /* Hover-popover reference images on selected questions (venue, ambient). */
+  .question.has-guide { position: relative; }
+  .question.has-guide .guide-marker {
+    display: inline-block;
+    margin-left: 4px;
+    color: var(--v-emerald);
+    font-size: 13px;
+    vertical-align: middle;
+    cursor: help;
+  }
+  .guide-popover {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 18px);
+    width: 480px;
+    max-width: 50vw;
+    background: #fff;
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(15,38,34,0.18), 0 2px 6px rgba(15,38,34,0.08);
+    padding: 10px 10px 8px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-6px);
+    transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .guide-popover::before {
+    /* Small left-pointing arrow tying the popover to the question */
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: -8px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-left: 1px solid var(--line-2);
+    border-bottom: 1px solid var(--line-2);
+    transform: rotate(45deg);
+    border-radius: 2px;
+  }
+  .guide-popover img { display: block; width: 100%; height: auto; border-radius: 8px; }
+  .guide-popover .caption { font-size: 11px; color: var(--ink-3); margin-top: 6px; text-align: center; letter-spacing: 0.3px; text-transform: uppercase; font-weight: 600; }
+
+  /* Only enable hover behavior on devices that actually support hover. */
+  @media (hover: hover) and (pointer: fine) {
+    .question.has-guide:hover .guide-popover,
+    .question.has-guide:focus-within .guide-popover {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+  }
+  /* Below 980px the layout collapses to a single column; show popover below the
+     question instead of overflowing off-screen to the right. */
+  @media (max-width: 979px) {
+    .guide-popover { position: static; left: auto; width: 100%; max-width: 100%; margin-top: 10px; transform: none; box-shadow: 0 4px 12px rgba(15,38,34,0.08); display: none; }
+    .guide-popover::before { display: none; }
+    .question.has-guide:hover .guide-popover,
+    .question.has-guide:focus-within .guide-popover { display: block; opacity: 1; visibility: visible; }
+  }
+  /* Hide the marker / popover entirely when print view is active. */
+  @media print { .guide-marker, .guide-popover { display: none !important; } }
   .question .hint { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
   .options { display: flex; flex-wrap: wrap; gap: 6px; }
   .options input[type="radio"] { display: none; }
@@ -190,6 +262,14 @@
   .rank-3 .rank-badge { background: var(--ink-2); }
   .rank-other .rank-badge { background: var(--ink-3); }
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; padding-top: 4px; }
+  .card-head .head-left { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; min-width: 0; }
+  .card-head .head-text { min-width: 0; }
+  .card-head .head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: 0 0 auto; }
+  .card-thumb { width: 80px; height: 60px; object-fit: cover; border-radius: 4px; background: #f3f5f4; border: 1px solid var(--line); flex: 0 0 auto; display: block; }
+  .card-thumb.no-thumb { display: none; }
+  @media (max-width: 480px) {
+    .card-thumb { width: 64px; height: 48px; }
+  }
   .brand-tag { display: inline-block; padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #fff; text-transform: uppercase; }
   .brand-tcl { background: var(--tcl); }
   .brand-samsung { background: var(--samsung); }
@@ -267,7 +347,7 @@
 <body>
 <header class="header">
   <a class="logo" href="https://vistifyinc.com" target="_blank" rel="noopener">
-    <img src="vistify-wordmark.png" alt="Vistify">
+    <img src="assets/brand/vistify-wordmark.png" alt="Vistify">
   </a>
   <div class="divider"></div>
   <div class="product-name">Commercial&nbsp;Display Brand &amp; Model Selector</div>
@@ -283,8 +363,8 @@
     <section class="panel" aria-label="Customer Questionnaire">
       <div class="panel-head"><h2>Customer Profile</h2></div>
       <div class="panel-body">
-        <div class="question">
-          <label class="q">1. Venue type & viewing angle</label>
+        <div class="question has-guide">
+          <label class="q">1. Venue type & viewing angle <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Single QSR menu boards are viewed head-on (standard angle). Food / event halls have open layouts that need wide off-axis viewing (IPS).</div>
           <div class="options" data-q="venue">
             <input type="radio" name="venue" id="venue-qsr" value="qsr" checked />
@@ -292,9 +372,13 @@
             <input type="radio" name="venue" id="venue-hall" value="hall" />
             <label for="venue-hall">Food / Event Hall · Wide angle</label>
           </div>
+          <div class="guide-popover" role="img" aria-label="Viewing-angle reference: Single QSR vs. Food Hall">
+            <img src="assets/guides/viewing-angle.jpg" srcset="assets/guides/viewing-angle.jpg 1x, assets/guides/viewing-angle@2x.jpg 2x" alt="Venue type comparison — Single QSR (head-on viewing) vs. Food Hall (wide off-axis viewing)" loading="lazy" />
+            <div class="caption">Viewing-angle reference &middot; QSR vs. Food Hall</div>
+          </div>
         </div>
-        <div class="question">
-          <label class="q">2. Ambient lighting at the install location</label>
+        <div class="question has-guide">
+          <label class="q">2. Ambient lighting at the install location <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Indoor only. Brighter interior spaces (atria, daylit dining rooms) need higher-NIT panels and a higher-haze (anti-glare) surface to cut reflections. Dim interiors favor lower haze for image clarity.</div>
           <div class="options" data-q="ambient">
             <input type="radio" name="ambient" id="amb-min" value="minimal" />
@@ -303,6 +387,10 @@
             <label for="amb-mod">Moderate (typical retail / lobby)</label>
             <input type="radio" name="ambient" id="amb-high" value="high" />
             <label for="amb-high">High (bright atrium / daylit interior)</label>
+          </div>
+          <div class="guide-popover" role="img" aria-label="Ambient lighting reference: Minimal, Moderate, High">
+            <img src="assets/guides/ambient-lighting.jpg" srcset="assets/guides/ambient-lighting.jpg 1x, assets/guides/ambient-lighting@2x.jpg 2x" alt="Ambient lighting comparison — Minimal (dim interior), Moderate (typical retail/lobby), High (bright atrium/daylit interior)" loading="lazy" />
+            <div class="caption">Ambient-lighting reference &middot; Minimal / Moderate / High</div>
           </div>
         </div>
         <div class="question">
@@ -347,7 +435,7 @@
         </div>
         <div class="question">
           <label class="q">7. Built-in SoC media playback required?</label>
-          <div class="hint">Commercial displays with built-in SoC reduce install complexity. Selecting No opens up the Consumer TV + external Minix Player option.</div>
+          <div class="hint">Commercial displays with built-in SoC reduce install complexity. Selecting No opens up the Consumer TV +VPlayer option.</div>
           <div class="options" data-q="soc">
             <input type="radio" name="soc" id="soc-yes" value="yes" checked />
             <label for="soc-yes">Yes (commercial SoC)</label>
@@ -391,9 +479,9 @@
       <div class="brand-strip">
         <div class="brand-strip-label">Supported Commercial SoC Displays</div>
         <div class="brand-strip-list">
-          <a class="brand-strip-item" href="https://us.tcl.com/pages/digital-signage" target="_blank" rel="noopener"><img src="brand-tcl.png" alt="TCL" /></a>
-          <a class="brand-strip-item" href="https://pro.sony/ue_US/products/pro-displays" target="_blank" rel="noopener"><img src="sony-logo.png" alt="Sony" /></a>
-          <a class="brand-strip-item" href="https://www.samsung.com/us/business/smart-signage/uhd-4k-signage/qm-series/" target="_blank" rel="noopener"><img src="Samsung-Logo.png" alt="Samsung" /></a>
+          <a class="brand-strip-item" href="https://us.tcl.com/pages/digital-signage" target="_blank" rel="noopener"><img src="assets/brand/tcl-logo.png" alt="TCL" /></a>
+          <a class="brand-strip-item" href="https://pro.sony/ue_US/products/pro-displays" target="_blank" rel="noopener"><img src="assets/brand/sony-logo.png" alt="Sony" /></a>
+          <a class="brand-strip-item" href="https://www.samsung.com/us/business/smart-signage/uhd-4k-signage/qm-series/" target="_blank" rel="noopener"><img src="assets/brand/samsung-logo.png" alt="Samsung" /></a>
         </div>
       </div>
     </section>
@@ -406,6 +494,14 @@
 </footer>
 <script>
 const COST_TIER_MAX = 5;
+// Product-shot thumbnails shown in each card header (right of brand + series).
+// Optimized 4:3 JPEGs in /assets/displays/, served with @2x for retina.
+const BRAND_THUMBS = {
+  "TCL":         { src: "assets/displays/tcl-screen.jpg",      srcset: "assets/displays/tcl-screen.jpg 1x, assets/displays/tcl-screen@2x.jpg 2x" },
+  "Samsung":     { src: "assets/displays/samsung-screen.jpg",  srcset: "assets/displays/samsung-screen.jpg 1x, assets/displays/samsung-screen@2x.jpg 2x" },
+  "Sony":        { src: "assets/displays/sony-screen.jpg",     srcset: "assets/displays/sony-screen.jpg 1x, assets/displays/sony-screen@2x.jpg 2x" },
+  "Consumer TV": { src: "assets/displays/consumer-screen.jpg", srcset: "assets/displays/consumer-screen.jpg 1x, assets/displays/consumer-screen@2x.jpg 2x" }
+};
 const DISPLAYS = [
   { brand:"TCL",     brandClass:"brand-tcl",     series:"TM",   sku:"TCL-TM-",
     nits:500, gamut:"93% DCI-P3", gamutType:"dci",  runtime:"24/7", panel:"VA",  angle:"Standard",
@@ -463,7 +559,7 @@ const DISPLAYS = [
     appVenue:"hall", appAmbient:"moderate", appContent:"vivid",
     soc:true,
     costTier:4 },
-  { brand:"Consumer TV", brandClass:"brand-consumer", series:"TV + Minix Player", sku:"vPlayer-",
+  { brand:"Consumer TV", brandClass:"brand-consumer", series:"+VPlayer", sku:"vPlayer-",
     omitSeriesSuffix:true,
     nits:250, gamut:"87% DCI-P3", gamutType:"dci",  runtime:"8/7", panel:"VA",  angle:"Standard",
     staticContrast:"4000:1", dynContrast:"Mega",       haze:0.02, deepBlack:false,
@@ -776,7 +872,7 @@ function printSummary() {
   if (!area) { window.print(); return; }
   let body = '<div class="print-doc">' +
     '<div class="print-header">' +
-      '<img src="vistify-wordmark.png" alt="Vistify">' +
+      '<img src="assets/brand/vistify-wordmark.png" alt="Vistify">' +
       '<div class="print-title">Digital Menu Board — Sales Summary</div>' +
       '<div class="print-date">' + esc(dateStr) + '</div>' +
     '</div>';
@@ -1025,16 +1121,26 @@ function renderResults(ranked, prefs) {
     const rankLabel = rank === 1 ? "Top Pick" : rank === 2 ? "Strong Alt" : rank === 3 ? "Also Consider" : `#${rank}`;
     const d = r.d;
 
+    const thumb = BRAND_THUMBS[d.brand];
+    const thumbImg = thumb
+      ? `<img class="card-thumb" src="${thumb.src}" srcset="${thumb.srcset}" alt="${d.brand} display sample" loading="lazy" />`
+      : "";
+
     html += `
       <div class="card ${rankClass} ${dimmed} ${rank === 1 ? "selected" : ""}" data-idx="${idx}" data-sku="${d.sku}" data-name="${d.brand} ${d.series}${d.omitSeriesSuffix ? "" : " Series"}">
         <span class="rank-badge">${rankLabel}</span>
         <span class="selected-check">&#10003;</span>
         <div class="card-head">
-          <div>
-            <span class="brand-tag ${d.brandClass}">${d.brand}</span>
-            <div class="series-name">${d.series}${d.omitSeriesSuffix ? "" : " Series"}</div>
+          <div class="head-left">
+            <div class="head-text">
+              <span class="brand-tag ${d.brandClass}">${d.brand}</span>
+              <div class="series-name">${d.series}${d.omitSeriesSuffix ? "" : " Series"}</div>
+            </div>
           </div>
-          <div class="cost-tier">${costTierString(d.costTier)}</div>
+          <div class="head-right">
+            ${thumbImg}
+            <div class="cost-tier">${costTierString(d.costTier)}</div>
+          </div>
         </div>
         <div class="match-label"><span>Fit Score</span><span>${r.pct}%</span></div>
         <div class="match-bar"><div class="match-fill" style="width:${r.pct}%"></div></div>
