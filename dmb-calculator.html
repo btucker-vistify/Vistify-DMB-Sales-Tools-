@@ -67,12 +67,36 @@
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.8px;
+    flex: 1 1 auto;
+  }
+  .header .back-to-selector {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: var(--ink-2, #4a5552);
+    background: #fff;
+    border: 1px solid var(--line-2, #d8d8d0);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .header .back-to-selector:hover {
+    background: var(--v-black, #0f2622);
+    color: #fff;
+    border-color: var(--v-black, #0f2622);
   }
   @media (max-width: 600px) {
-    .header { padding: 14px 18px; gap: 12px; }
+    .header { padding: 14px 18px; gap: 12px; flex-wrap: wrap; }
     .logo { height: 30px; }
     .header .divider { height: 22px; }
     .header .product-name { font-size: 11px; letter-spacing: 0.5px; }
+    .header .back-to-selector { font-size: 11px; padding: 6px 10px; }
   }
 
   /* Layout */
@@ -724,6 +748,9 @@
   </div>
   <div class="divider"></div>
   <div class="product-name">Digital&nbsp;Menu&nbsp;Board Measurement&nbsp;Calculator&nbsp;Tool</div>
+  <a class="back-to-selector" href="screen-selector.html" aria-label="Back to Display Selector">
+    <span aria-hidden="true">&larr;</span>&nbsp;Back to Display Selector
+  </a>
 </header>
 
 <main class="container">
