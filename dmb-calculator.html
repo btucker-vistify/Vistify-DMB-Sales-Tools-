@@ -483,6 +483,91 @@
   }
   .copy-row button.primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
 
+  /* Request quote button (below Configuration SKU) */
+  .quote-row {
+    grid-column: 2 / -1;
+    margin-top: 10px;
+  }
+  .quote-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1.5px solid var(--teal);
+    background: var(--teal);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.3px;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .quote-btn:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
+  .quote-btn:active { transform: scale(0.97); }
+  .quote-row .hint { margin-top: 5px; }
+  /* Quote request modal (Salesforce Web-to-Lead) */
+  .quote-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .quote-modal-backdrop { position: absolute; inset: 0; background: rgba(10, 10, 10, 0.55); }
+  .quote-modal-card {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 12px 48px rgba(15, 38, 34, 0.25);
+  }
+  .quote-modal-card h3 { margin: 0 0 6px; font-size: 18px; font-weight: 700; }
+  .quote-modal-sub { margin: 0 0 20px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .quote-modal-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 30px; height: 30px;
+    border: none; border-radius: 50%;
+    background: var(--bg); color: var(--muted);
+    font-size: 18px; line-height: 1; cursor: pointer;
+    font-family: inherit;
+  }
+  .quote-modal-close:hover { background: var(--teal-light); color: var(--ink); }
+  .qf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .qf-field { margin-bottom: 14px; }
+  .qf-field label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 5px; }
+  .qf-field input {
+    width: 100%; padding: 10px 12px; font-size: 14px;
+    border: 1.5px solid var(--line); border-radius: 8px;
+    font-family: inherit; color: var(--ink);
+  }
+  .qf-field input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+  .qf-config {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 16px;
+  }
+  .qf-config-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 4px; }
+  .qf-config pre {
+    margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px; white-space: pre-wrap; word-break: break-word; color: var(--ink);
+  }
+  .qf-submit {
+    width: 100%; padding: 12px; border: none; border-radius: 10px;
+    background: var(--teal); color: white; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: background 0.15s;
+  }
+  .qf-submit:hover { background: var(--teal-dark); }
+  .qf-alt { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .qf-alt a { color: var(--teal-dark); font-weight: 600; text-decoration: none; }
+  .qf-alt a:hover { text-decoration: underline; }
+  .quote-thanks { text-align: center; padding: 12px 0 4px; }
+  .quote-thanks-icon {
+    width: 46px; height: 46px; margin: 0 auto 12px;
+    background: var(--teal); color: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700;
+  }
+  .quote-thanks p { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 8px 0 18px; }
+
   /* Configuration SKU pill */
   .sku-row {
     align-items: center;
@@ -809,7 +894,7 @@
         <label for="screenCount">Number of screens (edge to edge)</label>
         <div class="stepper">
           <button type="button" onclick="stepCount(-1)">−</button>
-          <input type="number" id="screenCount" value="3" min="1" max="8">
+          <input type="number" id="screenCount" value="3" min="1" max="12">
           <button type="button" onclick="stepCount(1)">+</button>
         </div>
         <div class="hint">Screens are tiled horizontally in a single row</div>
@@ -994,6 +1079,13 @@
         <a href="#" id="skuPrefixClear">clear</a>
       </div>
 
+      <div class="quote-row">
+        <button type="button" id="quoteBtn" class="quote-btn" onclick="requestQuote()">
+          <span aria-hidden="true">&#9993;</span> Request a Quote
+        </button>
+        <div class="hint" id="quoteHint">Sends this configuration straight to our sales team — no email app needed</div>
+      </div>
+
       <div id="ceilingResults" class="hide">
         <div class="result-row hero" style="margin-top:12px;">
           <div class="label">Minimum pole length</div>
@@ -1074,7 +1166,7 @@
   });
   document.getElementById('screenCount').addEventListener('input', e => {
     const v = parseInt(e.target.value, 10);
-    state.count = isNaN(v) ? 1 : Math.max(1, Math.min(8, v));
+    state.count = isNaN(v) ? 1 : Math.max(1, Math.min(12, v));
     compute();
   });
   ['mountSurface', 'ceilingHeight', 'headClearance', 'spaceWidth', 'spaceHeight'].forEach(id => {
@@ -1086,7 +1178,7 @@
 
   function stepCount(d) {
     const el = document.getElementById('screenCount');
-    const newVal = Math.max(1, Math.min(8, (parseInt(el.value, 10) || 1) + d));
+    const newVal = Math.max(1, Math.min(12, (parseInt(el.value, 10) || 1) + d));
     el.value = newVal;
     state.count = newVal;
     compute();
@@ -1222,6 +1314,45 @@
   const POLE_COUPLER = { model: 'SM-CEILING-FFC-BLK', len: 1 };
   const POLE_MAX_TOTAL = 170;
 
+  // SM-CB-CM-S ceiling mount kits required per digital menu board package
+  // (per concept-files/"SM-CB-CM-S per Ceiling Install.xlsx"). Keys match the
+  // ceiling configuration SKU body ({count}x{size}C{L|P}). Each kit hangs on
+  // its own pole assembly, so pole and coupler quantities scale with this count.
+  const SM_CB_CM_S_QTY = {
+    // Ceiling landscape
+    '1x32CL': 1, '1x43CL': 1, '1x50CL': 1, '1x55CL': 1, '1x65CL': 1, '1x75CL': 1,
+    '2x32CL': 1, '2x43CL': 1, '2x50CL': 1, '2x55CL': 2, '2x65CL': 2, '2x75CL': 2,
+    '3x32CL': 1, '3x43CL': 2, '3x50CL': 2, '3x55CL': 2, '3x65CL': 2, '3x75CL': 3,
+    '4x32CL': 2, '4x43CL': 2, '4x50CL': 2, '4x55CL': 2, '4x65CL': 2, '4x75CL': 4,
+    '5x32CL': 2, '5x43CL': 3, '5x50CL': 3, '5x55CL': 3, '5x65CL': 3, '5x75CL': 5,
+    '6x32CL': 2, '6x43CL': 3, '6x50CL': 3, '6x55CL': 3, '6x65CL': 4, '6x75CL': 6,
+    // Ceiling portrait
+    '1x32CP': 1, '1x43CP': 1, '1x50CP': 1, '1x55CP': 1, '1x65CP': 1, '1x75CP': 1,
+    '2x32CP': 1, '2x43CP': 1, '2x50CP': 1, '2x55CP': 1, '2x65CP': 1, '2x75CP': 2,
+    '3x32CP': 1, '3x43CP': 1, '3x50CP': 1, '3x55CP': 2, '3x65CP': 2, '3x75CP': 2,
+    '4x32CP': 2, '4x43CP': 2, '4x50CP': 2, '4x55CP': 2, '4x65CP': 2, '4x75CP': 2,
+    '5x32CP': 2, '5x43CP': 2, '5x50CP': 2, '5x55CP': 3, '5x65CP': 3, '5x75CP': 3,
+    '6x32CP': 2, '6x43CP': 2, '6x50CP': 2, '6x55CP': 3, '6x65CP': 3, '6x75CP': 4
+  };
+  const SM_CB_CM_S_MODEL = 'SM-CB-CM-S';
+
+  // Number of SM-CB-CM-S kits for the current ceiling configuration.
+  // Counts 1-6 come straight from the xlsx table. Counts 7-12 are treated as
+  // two smaller bundles split as evenly as possible (7=4+3, 8=4+4, 9=5+4,
+  // 10=5+5, 11=6+5, 12=6+6) and their kit quantities summed.
+  // Bundles missing from the xlsx table default to 1 kit per sub-bundle.
+  function getMountKitQty() {
+    if (state.mountType !== 'ceiling') return 0;
+    const orientChar = state.orientation === 'landscape' ? 'L' : 'P';
+    const lookup = function (count) {
+      return SM_CB_CM_S_QTY[count + 'x' + state.size + 'C' + orientChar] || 1;
+    };
+    if (state.count <= 6) return lookup(state.count);
+    const a = Math.ceil(state.count / 2);
+    const b = state.count - a;
+    return lookup(a) + lookup(b);
+  }
+
   // Choose the simplest pole assembly that brackets the required length L.
   // Returns { poles: [model,...], assemblyMin, assemblyMax, parts } or { error, ... }.
   // Default is a single adjustable pole; up to 2 fixed poles + 2 couplers can be added.
@@ -1290,7 +1421,20 @@
     if (sel.error === 'too_long')  return '(pole length ' + poleLength.toFixed(1) + '" exceeds ' + POLE_MAX_TOTAL + '" max — no compatible assembly)';
     if (sel.error === 'too_short') return '(pole length ' + poleLength.toFixed(1) + '" below ' + sel.min + '" minimum)';
     if (sel.error || !sel.poles.length) return '';
-    return '(' + sel.poles.join(', ') + ')';
+    // One full pole assembly is required per SM-CB-CM-S mount kit, so multiply
+    // every pole/coupler in the selected assembly by the kit quantity for this
+    // bundle and aggregate duplicate models into a single quantified entry.
+    const kitQty = getMountKitQty() || 1;
+    const counts = {};
+    const order = [];
+    sel.poles.forEach(function (m) {
+      if (!(m in counts)) { counts[m] = 0; order.push(m); }
+      counts[m] += kitQty;
+    });
+    const parts = [kitQty + '× ' + SM_CB_CM_S_MODEL].concat(
+      order.map(function (m) { return counts[m] + '× ' + m; })
+    );
+    return '(' + parts.join(', ') + ')';
   }
 
   function computeSku() {
@@ -2085,6 +2229,51 @@
     } catch (e) { return null; }
   }
 
+  // Quote request — opens a modal form that creates a Lead in Salesforce via
+  // Web-to-Lead (same org/fields as the vistifyinc.com contact form). The full
+  // configuration summary is attached to the Lead's Description field, and the
+  // POST targets a hidden iframe so the user stays on the calculator.
+  function requestQuote() {
+    const my = buildCalcSummary();
+    const sib = loadSelectorSummary();
+    let desc = 'Quote request from DMB Calculator\n\n' + my.text;
+    if (sib && sib.text) desc += '\n\n' + sib.text;
+    const descEl = document.getElementById('quoteDescription');
+    if (descEl) descEl.value = desc;
+    // Compact preview: the full combined SKU (details ride along in Description)
+    const suffix = getPoleSuffix();
+    const previewEl = document.getElementById('quoteConfigPreview');
+    if (previewEl) previewEl.textContent = getSkuPrefix() + computeSku() + (suffix ? ' ' + suffix : '');
+    const wrap = document.getElementById('quoteFormWrap');
+    const thanks = document.getElementById('quoteThanks');
+    if (wrap) wrap.classList.remove('hide');
+    if (thanks) thanks.classList.add('hide');
+    const modal = document.getElementById('quoteModal');
+    if (modal) modal.classList.remove('hide');
+    const first = document.getElementById('qf_first');
+    if (first) first.focus();
+  }
+  function closeQuoteModal() {
+    const modal = document.getElementById('quoteModal');
+    if (modal) modal.classList.add('hide');
+  }
+  // Modal wiring: show the thank-you state on submit (the POST completes in the
+  // hidden iframe), and let Escape close the modal.
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('quoteForm');
+    if (form) form.addEventListener('submit', function () {
+      setTimeout(function () {
+        const wrap = document.getElementById('quoteFormWrap');
+        const thanks = document.getElementById('quoteThanks');
+        if (wrap) wrap.classList.add('hide');
+        if (thanks) thanks.classList.remove('hide');
+      }, 250);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeQuoteModal();
+    });
+  });
+
   function copySummary() {
     const my = buildCalcSummary();
     const sib = loadSelectorSummary();
@@ -2134,6 +2323,61 @@
   compute();
 </script>
 
+<!-- Quote request modal — creates a Lead in Salesforce via Web-to-Lead.
+     Posts into a hidden iframe so the user never leaves the calculator. -->
+<div id="quoteModal" class="quote-modal hide" role="dialog" aria-modal="true" aria-labelledby="quoteModalTitle">
+  <div class="quote-modal-backdrop" onclick="closeQuoteModal()"></div>
+  <div class="quote-modal-card">
+    <button type="button" class="quote-modal-close" onclick="closeQuoteModal()" aria-label="Close">&times;</button>
+    <div id="quoteFormWrap">
+      <h3 id="quoteModalTitle">Request a Quote</h3>
+      <p class="quote-modal-sub">Send this configuration to our sales team and we'll reach out with pricing within 24 hours.</p>
+      <form id="quoteForm" action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&amp;orgId=00DHp000009vJXa" method="POST" target="quoteSubmitFrame">
+        <input type="hidden" name="oid" value="00DHp000009vJXa">
+        <input type="hidden" name="retURL" value="https://vistify-website-blush.vercel.app/thank-you">
+        <input type="hidden" name="lead_source" value="web">
+        <input type="hidden" name="description" id="quoteDescription" value="">
+        <div class="qf-row">
+          <div class="qf-field">
+            <label for="qf_first">First name *</label>
+            <input id="qf_first" name="first_name" maxlength="40" type="text" required>
+          </div>
+          <div class="qf-field">
+            <label for="qf_last">Last name *</label>
+            <input id="qf_last" name="last_name" maxlength="80" type="text" required>
+          </div>
+        </div>
+        <div class="qf-field">
+          <label for="qf_email">Email *</label>
+          <input id="qf_email" name="email" maxlength="80" type="email" required>
+        </div>
+        <div class="qf-row">
+          <div class="qf-field">
+            <label for="qf_phone">Phone</label>
+            <input id="qf_phone" name="phone" maxlength="40" type="tel">
+          </div>
+          <div class="qf-field">
+            <label for="qf_company">Company</label>
+            <input id="qf_company" name="company" maxlength="40" type="text">
+          </div>
+        </div>
+        <div class="qf-config">
+          <div class="qf-config-label">Included with your request</div>
+          <pre id="quoteConfigPreview"></pre>
+        </div>
+        <button type="submit" class="qf-submit" id="quoteSubmitBtn">Send quote request</button>
+        <div class="qf-alt">Prefer email? <a href="mailto:sales@vistifyinc.com">sales@vistifyinc.com</a> &middot; <a href="tel:+19492320070">(949) 232-0070</a></div>
+      </form>
+    </div>
+    <div id="quoteThanks" class="quote-thanks hide">
+      <div class="quote-thanks-icon">&#10003;</div>
+      <h3>Request sent</h3>
+      <p>Thanks! Your configuration is on its way to our sales team. We'll reach out within 24 hours.</p>
+      <button type="button" class="qf-submit" onclick="closeQuoteModal()">Done</button>
+    </div>
+    <iframe name="quoteSubmitFrame" style="display:none;" aria-hidden="true" title="Quote submission"></iframe>
+  </div>
+</div>
 <!-- Print-only summary; populated by printSummary() and hidden on screen. -->
 <div id="print-area" aria-hidden="true"></div>
 
