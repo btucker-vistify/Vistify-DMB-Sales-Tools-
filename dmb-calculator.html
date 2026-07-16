@@ -1440,7 +1440,14 @@
   function computeSku() {
     const mountChar = state.mountType === 'wall' ? 'W' : 'C';
     const orientChar = state.orientation === 'landscape' ? 'L' : 'P';
-    return state.count + 'x' + state.size + mountChar + orientChar;
+    const one = function (n) { return n + 'x' + state.size + mountChar + orientChar; };
+    if (state.count <= 6) return one(state.count);
+    // Configurations over 6 screens are fulfilled as two 1-6 screen bundles
+    // split as evenly as possible (7=4+3, 8=4+4, 9=5+4, 10=5+5, 11=6+5,
+    // 12=6+6), so the SKU lists both bundle SKUs to be combined. This matches
+    // the sub-bundle split used for SM-CB-CM-S kit quantities.
+    const a = Math.ceil(state.count / 2);
+    return one(a) + ' + ' + one(state.count - a);
   }
 
   function copySku() {
