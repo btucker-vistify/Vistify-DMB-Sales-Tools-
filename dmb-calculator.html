@@ -483,91 +483,6 @@
   }
   .copy-row button.primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
 
-  /* Request quote button (below Configuration SKU) */
-  .quote-row {
-    grid-column: 2 / -1;
-    margin-top: 10px;
-  }
-  .quote-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: 1.5px solid var(--teal);
-    background: var(--teal);
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    letter-spacing: 0.3px;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s;
-  }
-  .quote-btn:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
-  .quote-btn:active { transform: scale(0.97); }
-  .quote-row .hint { margin-top: 5px; }
-  /* Quote request modal (Salesforce Web-to-Lead) */
-  .quote-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .quote-modal-backdrop { position: absolute; inset: 0; background: rgba(10, 10, 10, 0.55); }
-  .quote-modal-card {
-    position: relative;
-    background: white;
-    border-radius: 16px;
-    padding: 28px;
-    width: 100%;
-    max-width: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 12px 48px rgba(15, 38, 34, 0.25);
-  }
-  .quote-modal-card h3 { margin: 0 0 6px; font-size: 18px; font-weight: 700; }
-  .quote-modal-sub { margin: 0 0 20px; font-size: 13px; color: var(--muted); line-height: 1.5; }
-  .quote-modal-close {
-    position: absolute; top: 14px; right: 14px;
-    width: 30px; height: 30px;
-    border: none; border-radius: 50%;
-    background: var(--bg); color: var(--muted);
-    font-size: 18px; line-height: 1; cursor: pointer;
-    font-family: inherit;
-  }
-  .quote-modal-close:hover { background: var(--teal-light); color: var(--ink); }
-  .qf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .qf-field { margin-bottom: 14px; }
-  .qf-field label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 5px; }
-  .qf-field input {
-    width: 100%; padding: 10px 12px; font-size: 14px;
-    border: 1.5px solid var(--line); border-radius: 8px;
-    font-family: inherit; color: var(--ink);
-  }
-  .qf-field input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
-  .qf-config {
-    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
-    padding: 10px 12px; margin-bottom: 16px;
-  }
-  .qf-config-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 4px; }
-  .qf-config pre {
-    margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 11.5px; white-space: pre-wrap; word-break: break-word; color: var(--ink);
-  }
-  .qf-submit {
-    width: 100%; padding: 12px; border: none; border-radius: 10px;
-    background: var(--teal); color: white; font-size: 14px; font-weight: 700;
-    cursor: pointer; font-family: inherit; transition: background 0.15s;
-  }
-  .qf-submit:hover { background: var(--teal-dark); }
-  .qf-alt { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
-  .qf-alt a { color: var(--teal-dark); font-weight: 600; text-decoration: none; }
-  .qf-alt a:hover { text-decoration: underline; }
-  .quote-thanks { text-align: center; padding: 12px 0 4px; }
-  .quote-thanks-icon {
-    width: 46px; height: 46px; margin: 0 auto 12px;
-    background: var(--teal); color: white; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; font-weight: 700;
-  }
-  .quote-thanks p { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 8px 0 18px; }
-
   /* Configuration SKU pill */
   .sku-row {
     align-items: center;
@@ -813,9 +728,8 @@
   }
   .surface-card img {
     width: 100%;
-    height: 150px;
-    object-fit: contain;
-    background: var(--bg);
+    height: 84px;
+    object-fit: cover;
     display: block;
     margin-bottom: 7px;
   }
@@ -930,7 +844,7 @@
         <label for="screenCount">Number of screens (edge to edge)</label>
         <div class="stepper">
           <button type="button" onclick="stepCount(-1)">−</button>
-          <input type="number" id="screenCount" value="3" min="1" max="12">
+          <input type="number" id="screenCount" value="3" min="1" max="8">
           <button type="button" onclick="stepCount(1)">+</button>
         </div>
         <div class="hint">Screens are tiled horizontally in a single row</div>
@@ -1153,13 +1067,6 @@
         <a href="#" id="skuPrefixClear">clear</a>
       </div>
 
-      <div class="quote-row">
-        <button type="button" id="quoteBtn" class="quote-btn" onclick="requestQuote()">
-          <span aria-hidden="true">&#9993;</span> Request a Quote
-        </button>
-        <div class="hint" id="quoteHint">Sends this configuration straight to our sales team — no email app needed</div>
-      </div>
-
       <div id="ceilingResults" class="hide">
         <div class="result-row hero" style="margin-top:12px;">
           <div class="label">Minimum pole length</div>
@@ -1241,7 +1148,7 @@
   });
   document.getElementById('screenCount').addEventListener('input', e => {
     const v = parseInt(e.target.value, 10);
-    state.count = isNaN(v) ? 1 : Math.max(1, Math.min(12, v));
+    state.count = isNaN(v) ? 1 : Math.max(1, Math.min(8, v));
     compute();
   });
   ['mountSurface', 'ceilingHeight', 'headClearance', 'spaceWidth', 'spaceHeight'].forEach(id => {
@@ -1268,7 +1175,7 @@
 
   function stepCount(d) {
     const el = document.getElementById('screenCount');
-    const newVal = Math.max(1, Math.min(12, (parseInt(el.value, 10) || 1) + d));
+    const newVal = Math.max(1, Math.min(8, (parseInt(el.value, 10) || 1) + d));
     el.value = newVal;
     state.count = newVal;
     compute();
@@ -1404,45 +1311,6 @@
   const POLE_COUPLER = { model: 'SM-CEILING-FFC-BLK', len: 1 };
   const POLE_MAX_TOTAL = 170;
 
-  // SM-CB-CM-S ceiling mount kits required per digital menu board package
-  // (per concept-files/"SM-CB-CM-S per Ceiling Install.xlsx"). Keys match the
-  // ceiling configuration SKU body ({count}x{size}C{L|P}). Each kit hangs on
-  // its own pole assembly, so pole and coupler quantities scale with this count.
-  const SM_CB_CM_S_QTY = {
-    // Ceiling landscape
-    '1x32CL': 1, '1x43CL': 1, '1x50CL': 1, '1x55CL': 1, '1x65CL': 1, '1x75CL': 1,
-    '2x32CL': 1, '2x43CL': 1, '2x50CL': 1, '2x55CL': 2, '2x65CL': 2, '2x75CL': 2,
-    '3x32CL': 1, '3x43CL': 2, '3x50CL': 2, '3x55CL': 2, '3x65CL': 2, '3x75CL': 3,
-    '4x32CL': 2, '4x43CL': 2, '4x50CL': 2, '4x55CL': 2, '4x65CL': 2, '4x75CL': 4,
-    '5x32CL': 2, '5x43CL': 3, '5x50CL': 3, '5x55CL': 3, '5x65CL': 3, '5x75CL': 5,
-    '6x32CL': 2, '6x43CL': 3, '6x50CL': 3, '6x55CL': 3, '6x65CL': 4, '6x75CL': 6,
-    // Ceiling portrait
-    '1x32CP': 1, '1x43CP': 1, '1x50CP': 1, '1x55CP': 1, '1x65CP': 1, '1x75CP': 1,
-    '2x32CP': 1, '2x43CP': 1, '2x50CP': 1, '2x55CP': 1, '2x65CP': 1, '2x75CP': 2,
-    '3x32CP': 1, '3x43CP': 1, '3x50CP': 1, '3x55CP': 2, '3x65CP': 2, '3x75CP': 2,
-    '4x32CP': 2, '4x43CP': 2, '4x50CP': 2, '4x55CP': 2, '4x65CP': 2, '4x75CP': 2,
-    '5x32CP': 2, '5x43CP': 2, '5x50CP': 2, '5x55CP': 3, '5x65CP': 3, '5x75CP': 3,
-    '6x32CP': 2, '6x43CP': 2, '6x50CP': 2, '6x55CP': 3, '6x65CP': 3, '6x75CP': 4
-  };
-  const SM_CB_CM_S_MODEL = 'SM-CB-CM-S';
-
-  // Number of SM-CB-CM-S kits for the current ceiling configuration.
-  // Counts 1-6 come straight from the xlsx table. Counts 7-12 are treated as
-  // two smaller bundles split as evenly as possible (7=4+3, 8=4+4, 9=5+4,
-  // 10=5+5, 11=6+5, 12=6+6) and their kit quantities summed.
-  // Bundles missing from the xlsx table default to 1 kit per sub-bundle.
-  function getMountKitQty() {
-    if (state.mountType !== 'ceiling') return 0;
-    const orientChar = state.orientation === 'landscape' ? 'L' : 'P';
-    const lookup = function (count) {
-      return SM_CB_CM_S_QTY[count + 'x' + state.size + 'C' + orientChar] || 1;
-    };
-    if (state.count <= 6) return lookup(state.count);
-    const a = Math.ceil(state.count / 2);
-    const b = state.count - a;
-    return lookup(a) + lookup(b);
-  }
-
   // Choose the simplest pole assembly that brackets the required length L.
   // Returns { poles: [model,...], assemblyMin, assemblyMax, parts } or { error, ... }.
   // Default is a single adjustable pole; up to 2 fixed poles + 2 couplers can be added.
@@ -1511,33 +1379,13 @@
     if (sel.error === 'too_long')  return '(pole length ' + poleLength.toFixed(1) + '" exceeds ' + POLE_MAX_TOTAL + '" max — no compatible assembly)';
     if (sel.error === 'too_short') return '(pole length ' + poleLength.toFixed(1) + '" below ' + sel.min + '" minimum)';
     if (sel.error || !sel.poles.length) return '';
-    // One full pole assembly is required per SM-CB-CM-S mount kit, so multiply
-    // every pole/coupler in the selected assembly by the kit quantity for this
-    // bundle and aggregate duplicate models into a single quantified entry.
-    const kitQty = getMountKitQty() || 1;
-    const counts = {};
-    const order = [];
-    sel.poles.forEach(function (m) {
-      if (!(m in counts)) { counts[m] = 0; order.push(m); }
-      counts[m] += kitQty;
-    });
-    const parts = [kitQty + '× ' + SM_CB_CM_S_MODEL].concat(
-      order.map(function (m) { return counts[m] + '× ' + m; })
-    );
-    return '(' + parts.join(', ') + ')';
+    return '(' + sel.poles.join(', ') + ')';
   }
 
   function computeSku() {
     const mountChar = state.mountType === 'wall' ? 'W' : 'C';
     const orientChar = state.orientation === 'landscape' ? 'L' : 'P';
-    const one = function (n) { return n + 'x' + state.size + mountChar + orientChar; };
-    if (state.count <= 6) return one(state.count);
-    // Configurations over 6 screens are fulfilled as two 1-6 screen bundles
-    // split as evenly as possible (7=4+3, 8=4+4, 9=5+4, 10=5+5, 11=6+5,
-    // 12=6+6), so the SKU lists both bundle SKUs to be combined. This matches
-    // the sub-bundle split used for SM-CB-CM-S kit quantities.
-    const a = Math.ceil(state.count / 2);
-    return one(a) + ' + ' + one(state.count - a);
+    return state.count + 'x' + state.size + mountChar + orientChar;
   }
 
   function copySku() {
@@ -1585,6 +1433,7 @@
     ['size','orientation','count','mountType','mountSurfaceType','mountSurface','ceilingHeight','headClearance','spaceWidth','spaceHeight'].forEach(k => {
       if (s[k] !== undefined) state[k] = s[k];
     });
+    renderSurfaceSelection();
     // <select> and <input> values
     const sz = document.getElementById('screenSize');
     if (sz) sz.value = String(state.size);
@@ -2081,4 +1930,304 @@
       // Max allowed top-of-screen line (only if effectiveLimit is finite and within view)
       if (isFinite(clearance.effectiveLimit)) {
         const maxTopY = floorY - clearance.effectiveLimit * scale;
-        if (maxTopY > padTop - 6 && maxTopY < flo
+        if (maxTopY > padTop - 6 && maxTopY < floorY) {
+          warnOverlay +=
+            '<line x1="' + leftEdge + '" y1="' + maxTopY + '" x2="' + rightEdge + '" y2="' + maxTopY + '" stroke="#E63962" stroke-width="1.4" stroke-dasharray="6,3"/>' +
+            '<rect x="' + (rightEdge - 92) + '" y="' + (maxTopY - 8) + '" width="88" height="14" fill="#E63962" rx="2"/>' +
+            '<text x="' + (rightEdge - 48) + '" y="' + (maxTopY + 2) + '" text-anchor="middle" font-size="8.5" fill="white" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.4">MAX SCREEN TOP</text>';
+        }
+      }
+      // Banner across the top of the diagram with the specific error
+      let bannerText = 'CLEARANCE ERROR';
+      if (clearance.errorType === 'pole')     bannerText = '⚠ CLEARANCE ERROR — POLE LENGTH NEGATIVE';
+      else if (clearance.errorType === 'missing') bannerText = '⚠ ENTER MOUNTING SURFACE OR CEILING HEIGHT';
+      else if (clearance.errorType === 'overhead') bannerText = '⚠ TOP OF SCREEN EXCEEDS CLEARANCE LIMIT';
+      const bannerW = 280;
+      const bannerX = (viewW - bannerW) / 2;
+      const bannerY = 2;
+      warnOverlay +=
+        '<rect x="' + bannerX + '" y="' + bannerY + '" width="' + bannerW + '" height="14" fill="#E63962" rx="3"/>' +
+        '<text x="' + (viewW / 2) + '" y="' + (bannerY + 10) + '" text-anchor="middle" font-size="9" fill="white" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.5">' + bannerText + '</text>';
+    }
+
+    svg.innerHTML = scene + spaceLayer + poles + screens + arrayBadge + widthDim + vDims + warnOverlay;
+  }
+
+  function updateRecommendations() {
+    const card = document.getElementById('recCard');
+    const list = document.getElementById('recList');
+    const w = parseFloat(state.spaceWidth);
+    const recInfo = getEffectiveSpaceInfo();
+    const h = recInfo.effectiveH;
+
+    if (!w || !h || w <= 0 || h <= 0) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = 'block';
+
+    // Generate viable combinations
+    const recs = [];
+    Object.keys(DISPLAYS).forEach(sizeStr => {
+      const size = parseInt(sizeStr, 10);
+      const d = DISPLAYS[size];
+      ['landscape', 'portrait'].forEach(orient => {
+        const sw = orient === 'landscape' ? d.w : d.h;
+        const sh = orient === 'landscape' ? d.h : d.w;
+        if (sh > h) return; // even one screen too tall
+        for (let n = 1; n <= 8; n++) {
+          const totalW = sw * n;
+          if (totalW > w) break;
+          recs.push({
+            size, orient, count: n,
+            totalW, totalH: sh,
+            coverage: (totalW * sh) / (w * h),
+            widthFill: totalW / w,
+            heightFill: sh / h
+          });
+        }
+      });
+    });
+
+    // Sort by coverage desc; tiebreaker prefers larger screens then fewer of them
+    recs.sort((a, b) => {
+      if (Math.abs(b.coverage - a.coverage) > 0.001) return b.coverage - a.coverage;
+      if (a.size !== b.size) return b.size - a.size;
+      return a.count - b.count;
+    });
+
+    // Deduplicate: keep best count per size+orientation
+    const seen = new Set();
+    const unique = [];
+    for (const r of recs) {
+      const k = r.size + '_' + r.orient;
+      if (seen.has(k)) continue;
+      seen.add(k);
+      unique.push(r);
+    }
+
+    const top = unique.slice(0, 5);
+
+    if (top.length === 0) {
+      list.innerHTML = '<div class="rec-empty">No screen combination fits in this space. Try increasing the available dimensions or choosing a smaller screen size.</div>';
+      return;
+    }
+
+    list.innerHTML = top.map((r, i) => {
+      const orientLabel = r.orient === 'landscape' ? 'Landscape' : 'Portrait';
+      const widthPct = Math.round(r.widthFill * 100);
+      const heightPct = Math.round(r.heightFill * 100);
+      return (
+        '<button type="button" class="rec' + (i === 0 ? ' best' : '') + '" ' +
+        'onclick="applyRec(' + r.size + ',\'' + r.orient + '\',' + r.count + ')">' +
+          '<div class="rec-info">' +
+            '<div class="title">' + r.count + ' × ' + r.size + '" ' + orientLabel + '</div>' +
+            '<div class="meta">' +
+              r.totalW.toFixed(1) + '" × ' + r.totalH.toFixed(1) + '" ' +
+              '(' + (r.totalW / 12).toFixed(2) + ' × ' + (r.totalH / 12).toFixed(2) + ' ft)<br>' +
+              widthPct + '% of width · ' + heightPct + '% of height' +
+            '</div>' +
+          '</div>' +
+          '<div class="rec-fill">' +
+            '<div class="pct">' + Math.round(r.coverage * 100) + '%</div>' +
+            '<div class="pct-label">filled</div>' +
+          '</div>' +
+        '</button>'
+      );
+    }).join('');
+  }
+
+  function applyRec(size, orient, count) {
+    state.size = size;
+    state.orientation = orient;
+    state.count = count;
+    document.getElementById('screenSize').value = size;
+    document.getElementById('screenCount').value = count;
+    document.querySelectorAll('#orientation button').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === orient);
+    });
+    compute();
+    document.getElementById('diagram').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Combined summary — Copy Summary and Print on either page produce a single
+  // document covering the calculator configuration AND the screen-selector
+  // display pick. Each page saves its own summary to localStorage on every
+  // state change; the sibling page reads it back when the user copies/prints.
+  // ---------------------------------------------------------------------------
+  const CALC_SUMMARY_KEY = 'vistify.calcSummary';
+  const SELECTOR_SUMMARY_KEY = 'vistify.selectorSummary';
+
+  // Small HTML escape so user-typed values can't break the print markup.
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function kvRow(label, value) {
+    return '<tr><td>' + esc(label) + '</td><td>' + value + '</td></tr>';
+  }
+
+  // Build the prefix-INDEPENDENT half of the calculator summary. Cached to
+  // localStorage so the Screen Selector can include it in Copy/Print without
+  // rebuilding the math itself. The SKU prefix is intentionally NOT baked in
+  // here — it's prepended at render time using the live `vistify.skuPrefix`
+  // value, which fixes the stale-prefix bug when the user changes their
+  // display selection on the other page after the calculator was last open.
+  function buildCalcSummaryRaw() {
+    const d = DISPLAYS[state.size];
+    const perScreenW = state.orientation === 'landscape' ? d.w : d.h;
+    const perScreenH = state.orientation === 'landscape' ? d.h : d.w;
+    const overallW = perScreenW * state.count;
+    const skuBody = computeSku();
+
+    // Plain-text body lines (everything EXCEPT the prefix-dependent header)
+    const bodyLines = [
+      'Screen size:       ' + state.size + '"',
+      'Orientation:       ' + (state.orientation === 'landscape' ? 'Landscape' : 'Portrait'),
+      'Number of screens: ' + state.count,
+      'Per-screen:        ' + perScreenW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H',
+      'Overall array:     ' + overallW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H',
+      '                   (' + (overallW / 12).toFixed(2) + ' ft × ' + (perScreenH / 12).toFixed(2) + ' ft)',
+      'Mount type:        ' + (state.mountType === 'wall' ? 'Wall mount' : 'Ceiling mount (suspended pole)')
+    ];
+
+    let poleSuffix = '';
+    let mountSurfaceNum = null, headNum = null, poleLength = null, ceilingNum = null;
+    if (state.mountType === 'ceiling') {
+      if (state.mountSurfaceType) bodyLines.push('Mounting surface:  ' + state.mountSurfaceType);
+      poleSuffix = getPoleSuffix();
+      if (poleSuffix) bodyLines.push('Pole assembly:     ' + poleSuffix.replace(/^\(|\)$/g, ''));
+      mountSurfaceNum = parseFloat(state.mountSurface) || 0;
+      headNum = parseFloat(state.headClearance) || 0;
+      poleLength = mountSurfaceNum - (headNum + perScreenH / 2 + HARDWARE_INCHES);
+      bodyLines.push('Mount surface ht:  ' + mountSurfaceNum.toFixed(1) + '"');
+      if (state.ceilingHeight !== '' && state.ceilingHeight != null) {
+        ceilingNum = parseFloat(state.ceilingHeight);
+        bodyLines.push('Ceiling height:    ' + ceilingNum.toFixed(1) + '"');
+      }
+      bodyLines.push('Head clearance:    ' + headNum.toFixed(1) + '"');
+      bodyLines.push('Min pole length:   ' + poleLength.toFixed(1) + '"');
+    }
+
+    // HTML body rows (same content, no prefix references)
+    let bodyRows = '';
+    bodyRows += kvRow('Screen size', esc(state.size) + '"');
+    bodyRows += kvRow('Orientation', state.orientation === 'landscape' ? 'Landscape' : 'Portrait');
+    bodyRows += kvRow('Number of screens', esc(state.count));
+    bodyRows += kvRow('Per-screen dimensions', perScreenW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H');
+    bodyRows += kvRow('Overall array', overallW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H ' +
+                  '(' + (overallW / 12).toFixed(2) + ' ft × ' + (perScreenH / 12).toFixed(2) + ' ft)');
+    bodyRows += kvRow('Mount type', state.mountType === 'wall' ? 'Wall mount' : 'Ceiling mount (suspended pole)');
+    if (state.mountType === 'ceiling') {
+      if (state.mountSurfaceType) bodyRows += kvRow('Ceiling mounting surface', esc(state.mountSurfaceType));
+      if (poleSuffix) bodyRows += kvRow('Pole assembly', '<span class="sku">' + esc(poleSuffix.replace(/^\(|\)$/g, '')) + '</span>');
+      bodyRows += kvRow('Mount surface ht', mountSurfaceNum.toFixed(1) + '"');
+      if (ceilingNum != null) bodyRows += kvRow('Ceiling height', ceilingNum.toFixed(1) + '"');
+      bodyRows += kvRow('Head clearance', headNum.toFixed(1) + '"');
+      bodyRows += kvRow('Min pole length', poleLength.toFixed(1) + '"');
+    }
+
+    return { skuBody: skuBody, bodyText: bodyLines.join('\n'), bodyRows: bodyRows };
+  }
+
+  // Take a raw calc summary (prefix-free) and render the final text + HTML
+  // using the CURRENT SKU prefix from storage. This is the only place the
+  // prefix is concatenated, so it always reflects the user's latest pick.
+  function renderCalcSummary(raw, prefix, prefixName) {
+    if (!raw) return null;
+    const fullSku = (prefix || '') + raw.skuBody;
+    const headerLines = [
+      'Vistify Digital Menu Board — Configuration Summary',
+      '----------------------------------------------------',
+      'Configuration SKU: ' + fullSku
+    ];
+    if (prefix) headerLines.push('Display selection: ' + (prefixName || 'See Screen Selector') + ' (prefix ' + prefix + ')');
+
+    let headerRows = '';
+    headerRows += kvRow('Configuration SKU', '<span class="sku">' + esc(fullSku) + '</span>');
+    if (prefix) headerRows += kvRow('Display selection', esc(prefixName || 'See Screen Selector') + ' <span class="sku">(' + esc(prefix) + ')</span>');
+
+    const text = headerLines.join('\n') + '\n' + raw.bodyText;
+    const html =
+      '<section class="print-block">' +
+        '<h2>Configuration (Measurement Calculator)</h2>' +
+        '<table class="print-kv"><tbody>' + headerRows + raw.bodyRows + '</tbody></table>' +
+      '</section>';
+    return { text: text, html: html };
+  }
+
+  // Render the calc summary using current state + current live prefix.
+  function buildCalcSummary() {
+    return renderCalcSummary(buildCalcSummaryRaw(), getSkuPrefix(), getSkuPrefixName());
+  }
+
+  // Persist the prefix-INDEPENDENT calc summary so the screen-selector page
+  // can pull it in and apply its own current prefix at render time.
+  function saveCalcSummaryToStorage() {
+    try {
+      localStorage.setItem(CALC_SUMMARY_KEY, JSON.stringify(buildCalcSummaryRaw()));
+    } catch (e) { /* non-fatal */ }
+  }
+  function loadSelectorSummary() {
+    try {
+      const raw = localStorage.getItem(SELECTOR_SUMMARY_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function copySummary() {
+    const my = buildCalcSummary();
+    const sib = loadSelectorSummary();
+    let text = my.text;
+    if (sib && sib.text) {
+      text += '\n\n' + sib.text;
+    } else {
+      text += '\n\n(No display selection saved yet — visit the Screen Selector to add one.)';
+    }
+    navigator.clipboard.writeText(text).then(function () {
+      const btn = document.getElementById('copyBtn');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(function () { btn.textContent = orig; }, 1600);
+    });
+  }
+
+  function printSummary() {
+    const my = buildCalcSummary();
+    const sib = loadSelectorSummary();
+    const dateStr = new Date().toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+    const area = document.getElementById('print-area');
+    if (!area) { window.print(); return; }
+    let body = '<div class="print-doc">' +
+      '<div class="print-header">' +
+        '<img src="assets/brand/vistify-wordmark.png" alt="Vistify">' +
+        '<div class="print-title">Digital Menu Board — Sales Summary</div>' +
+        '<div class="print-date">' + esc(dateStr) + '</div>' +
+      '</div>' +
+      my.html;
+    if (sib && sib.html) {
+      body += sib.html;
+    } else {
+      body += '<section class="print-block"><h2>Display Selection (Screen Selector)</h2>' +
+              '<div class="print-missing">No display selection saved yet — open the Screen Selector page to choose a display.</div>' +
+              '</section>';
+    }
+    body += '<div class="print-footer">Generated by the Vistify Digital Menu Board Sales Tool.</div>' +
+            '</div>';
+    area.innerHTML = body;
+    window.print();
+  }
+
+  // Restore prior calculator configuration (if any) BEFORE the initial compute
+  // so the UI loads with the user's last inputs already in place.
+  applyCalcStateToForm(loadCalcState());
+  compute();
+</script>
+
+<!-- Print-only summary; populated by printSummary() and hidden on screen. -->
+<div id="print-area" aria-hidden="true"></div>
+
+</body>
+</html>
