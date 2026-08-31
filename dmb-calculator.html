@@ -1464,6 +1464,55 @@
     { model: 'SM-FIXPOLE-60-BLK', len: 60 }
   ];
   const POLE_COUPLER = { model: 'SM-CEILING-FFC-BLK', len: 1 };
+
+  // SM-CB-CM-S ceiling mount kits required per digital menu board package
+  // (per concept-files/"SM-CB-CM-S per Ceiling Install.xlsx"). Keys match the
+  // ceiling configuration SKU body ({count}x{size}C{L|P}).
+  const SM_CB_CM_S_QTY = {
+    // Ceiling landscape
+    '1x32CL': 1, '1x43CL': 1, '1x50CL': 1, '1x55CL': 1, '1x65CL': 1, '1x75CL': 1,
+    '2x32CL': 1, '2x43CL': 1, '2x50CL': 1, '2x55CL': 2, '2x65CL': 2, '2x75CL': 2,
+    '3x32CL': 1, '3x43CL': 2, '3x50CL': 2, '3x55CL': 2, '3x65CL': 2, '3x75CL': 3,
+    '4x32CL': 2, '4x43CL': 2, '4x50CL': 2, '4x55CL': 2, '4x65CL': 2, '4x75CL': 4,
+    '5x32CL': 2, '5x43CL': 3, '5x50CL': 3, '5x55CL': 3, '5x65CL': 3, '5x75CL': 5,
+    '6x32CL': 2, '6x43CL': 3, '6x50CL': 3, '6x55CL': 3, '6x65CL': 4, '6x75CL': 6,
+    // Ceiling portrait
+    '1x32CP': 1, '1x43CP': 1, '1x50CP': 1, '1x55CP': 1, '1x65CP': 1, '1x75CP': 1,
+    '2x32CP': 1, '2x43CP': 1, '2x50CP': 1, '2x55CP': 1, '2x65CP': 1, '2x75CP': 2,
+    '3x32CP': 1, '3x43CP': 1, '3x50CP': 1, '3x55CP': 2, '3x65CP': 2, '3x75CP': 2,
+    '4x32CP': 2, '4x43CP': 2, '4x50CP': 2, '4x55CP': 2, '4x65CP': 2, '4x75CP': 2,
+    '5x32CP': 2, '5x43CP': 2, '5x50CP': 2, '5x55CP': 3, '5x65CP': 3, '5x75CP': 3,
+    '6x32CP': 2, '6x43CP': 2, '6x50CP': 2, '6x55CP': 3, '6x65CP': 3, '6x75CP': 4
+  };
+  const SM_CB_CM_S_MODEL = 'SM-CB-CM-S';
+
+  // SKU suffix for each ceiling mounting surface option (added to the bundle
+  // alongside SM-CB-CM-S in the same quantity).
+  const MOUNT_SURFACE_SKU = {
+    'Direct to I-Beam':                    'CLG-KIT-DIB',
+    'Direct to Wood Beam':                 'CLG-KIT-DWB',
+    'Flush Mount Backed Surface':          'CLG-KIT-FMB',
+    'Framed Sub-Ceiling 14-gauge Strut':   'CLG-KIT-FSC',
+    'Spanning I-Beams 14-gauge Strut':     'CLG-KIT-SIB',
+    'Spanning Single 12-gauge Strut':      'CLG-KIT-SSS',
+    'Spanning Wood Beams 14-gauge Strut':  'CLG-KIT-SWB'
+  };
+
+  // Number of SM-CB-CM-S kits (and matching mounting-surface kits) required for
+  // the current ceiling configuration. Counts 1-6 come from the xlsx table.
+  // Counts 7+ are split into two smaller bundles (7=4+3, 8=4+4, 9=5+4, 10=5+5,
+  // 11=6+5, 12=6+6) and their kit quantities summed.
+  function getMountKitQty() {
+    if (state.mountType !== 'ceiling') return 0;
+    const orientChar = state.orientation === 'landscape' ? 'L' : 'P';
+    const lookup = function (count) {
+      return SM_CB_CM_S_QTY[count + 'x' + state.size + 'C' + orientChar] || 1;
+    };
+    if (state.count <= 6) return lookup(state.count);
+    const a = Math.ceil(state.count / 2);
+    const b = state.count - a;
+    return lookup(a) + lookup(b);
+  }
   const POLE_MAX_TOTAL = 170;
 
   // Choose the simplest pole assembly that brackets the required length L.
@@ -1534,7 +1583,23 @@
     if (sel.error === 'too_long')  return '(pole length ' + poleLength.toFixed(1) + '" exceeds ' + POLE_MAX_TOTAL + '" max — no compatible assembly)';
     if (sel.error === 'too_short') return '(pole length ' + poleLength.toFixed(1) + '" below ' + sel.min + '" minimum)';
     if (sel.error || !sel.poles.length) return '';
-    return '(' + sel.poles.join(', ') + ')';
+    // One full pole assembly is required per SM-CB-CM-S mount kit, so multiply
+    // every pole/coupler in the selected assembly by the kit quantity for this
+    // bundle and aggregate duplicate models into a single quantified entry.
+    // If a mounting surface is selected, its matching kit SKU is included at
+    // the same quantity as SM-CB-CM-S.
+    const kitQty = getMountKitQty() || 1;
+    const counts = {};
+    const order = [];
+    sel.poles.forEach(function (m) {
+      if (!(m in counts)) { counts[m] = 0; order.push(m); }
+      counts[m] += kitQty;
+    });
+    const parts = [kitQty + '× ' + SM_CB_CM_S_MODEL];
+    const surfaceSku = MOUNT_SURFACE_SKU[state.mountSurfaceType];
+    if (surfaceSku) parts.push(kitQty + '× ' + surfaceSku);
+    order.forEach(function (m) { parts.push(counts[m] + '× ' + m); });
+    return '(' + parts.join(', ') + ')';
   }
 
   function computeSku() {
