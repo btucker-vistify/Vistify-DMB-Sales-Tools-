@@ -1,0 +1,2268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vistify Digital Menu Board Measurement Calculator Tool</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512.png">
+<meta name="theme-color" content="#2BB673">
+<style>
+  :root {
+    /* Vistify brand palette */
+    --teal: #2BB673;         /* Vistify primary kelly green */
+    --teal-dark: #1F9460;
+    --teal-light: #DCF3E5;
+    --mint: #A4E8C9;         /* Vistify light mint (display screens, accents) */
+    --brand-red: #E63962;    /* Vistify red wave accent */
+    --ink: #0A0A0A;
+    --muted: #6B7C7B;
+    --line: #E2EAE8;
+    --bg: #F5F9F8;
+    --warn: #E63962;         /* Use brand red for warnings */
+    --warn-bg: #FDECEC;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  .header {
+    background: white;
+    color: var(--ink);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .logo {
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+  .logo a { height: 100%; display: flex; align-items: center; text-decoration: none; }
+  .logo img { height: 100%; width: auto; display: block; }
+  .header .divider {
+    width: 1px;
+    height: 30px;
+    background: var(--line);
+    flex-shrink: 0;
+  }
+  .header .product-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    flex: 1 1 auto;
+  }
+  .header .back-to-selector {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: var(--ink-2, #4a5552);
+    background: #fff;
+    border: 1px solid var(--line-2, #d8d8d0);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .header .back-to-selector:hover {
+    background: var(--v-black, #0f2622);
+    color: #fff;
+    border-color: var(--v-black, #0f2622);
+  }
+  @media (max-width: 600px) {
+    .header { padding: 14px 18px; gap: 12px; flex-wrap: wrap; }
+    .logo { height: 30px; }
+    .header .divider { height: 22px; }
+    .header .product-name { font-size: 11px; letter-spacing: 0.5px; }
+    .header .back-to-selector { font-size: 11px; padding: 6px 10px; }
+  }
+
+  /* Layout */
+  .container {
+    max-width: 1200px;
+    margin: 32px auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .container { grid-template-columns: 1fr; margin: 20px auto; gap: 20px; }
+    .header { padding: 18px 20px; }
+    .header h1 { font-size: 17px; }
+    /* Flatten the two column wrappers so their cards become direct grid items, then reorder.
+       Mobile order: Available Space → Suggested Combinations → Display Configuration → Mount Type → Results */
+    .container > div { display: contents; }
+    .card-space     { order: 1; }
+    .card-suggested { order: 2; }
+    .card-display   { order: 3; }
+    .card-mount     { order: 4; }
+    .card-results   { order: 5; }
+  }
+
+  /* Card */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 1px 2px rgba(15, 38, 34, 0.04), 0 4px 16px rgba(15, 38, 34, 0.05);
+  }
+  .card + .card { margin-top: 20px; }
+  @media (max-width: 880px) {
+    /* When wrappers use display:contents, sibling-adjacent margin no longer applies; gap handles spacing */
+    .card + .card { margin-top: 0; }
+  }
+
+  h2 {
+    margin: 0 0 22px;
+    font-size: 17px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -0.01em;
+  }
+  h2 .badge {
+    background: var(--teal);
+    color: white;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Field */
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .field .hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  select, input[type="number"] {
+    width: 100%;
+    padding: 11px 12px;
+    font-size: 15px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    font-family: inherit;
+    color: var(--ink);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -moz-appearance: textfield;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  select:focus, input[type="number"]:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px var(--teal-light);
+  }
+
+  /* Segmented control */
+  .segmented {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+  }
+  .segmented button {
+    background: transparent;
+    border: none;
+    padding: 10px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .segmented button.active {
+    background: white;
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(15, 38, 34, 0.08);
+  }
+  .segmented button:not(.active):hover { color: var(--ink); }
+
+  /* Stepper */
+  .stepper {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .stepper:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+  .stepper button {
+    border: none;
+    background: white;
+    font-size: 18px;
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--ink);
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .stepper button:hover { background: var(--teal-light); }
+  .stepper input {
+    border: none;
+    text-align: center;
+    font-size: 15px;
+    border-left: 1.5px solid var(--line);
+    border-right: 1.5px solid var(--line);
+    border-radius: 0;
+  }
+  .stepper input:focus { outline: none; box-shadow: none; }
+
+  /* Results */
+  .visual {
+    background: linear-gradient(180deg, var(--teal-light) 0%, #F5F9F8 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 18px;
+    border: 1px solid var(--line);
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+  .visual.warn {
+    border: 1.5px solid var(--warn);
+    background: linear-gradient(180deg, #FDECEC 0%, #FFF6F6 100%);
+    box-shadow: 0 0 0 3px rgba(230,57,98,0.10);
+  }
+  .diagram-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+    margin: -8px 0 14px;
+    padding: 10px 12px;
+    background: #F5F9F8;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .diagram-note .icon {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: white;
+    font-weight: 800;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+  }
+  .diagram-note strong { color: var(--ink); font-weight: 700; }
+
+  .override-chip {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 9px 11px;
+    background: #FFF7E0;
+    border: 1px solid #E8B441;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #6B4A0A;
+    line-height: 1.4;
+  }
+  .override-chip .icon {
+    flex: 0 0 15px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #E8B441;
+    color: white;
+    font-weight: 800;
+    font-size: 10px;
+    line-height: 15px;
+    text-align: center;
+    margin-top: 1px;
+  }
+  .override-chip strong { color: #4A3406; font-weight: 700; }
+  .override-chip.hide { display: none; }
+  input.adjusted { border-color: #E8B441; background: #FFFDF5; }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    gap: 16px;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .label { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .result-row .value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .result-row .value .unit {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 4px;
+    font-weight: 500;
+  }
+  .result-row.hero {
+    background: var(--teal-light);
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: none;
+    margin-bottom: 4px;
+  }
+  .result-row.hero .label { color: var(--teal-dark); font-weight: 600; font-size: 13px; }
+  .result-row.hero .value { color: var(--teal-dark); font-size: 26px; }
+  .result-row.hero .value .unit { color: var(--teal-dark); opacity: 0.7; }
+
+  /* Alert */
+  .alert {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+  .alert.warn { background: var(--warn-bg); color: var(--warn); }
+  .alert.ok { background: var(--teal-light); color: var(--teal-dark); }
+  .alert .icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: white;
+    margin-top: 1px;
+  }
+  .alert.warn .icon { background: var(--warn); }
+  .alert.ok .icon { background: var(--teal-dark); }
+
+  .tag {
+    display: inline-block;
+    background: white;
+    color: var(--teal-dark);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--teal);
+  }
+  .tag.muted { color: var(--muted); border-color: var(--line); background: var(--bg); }
+
+  .hide { display: none !important; }
+
+  .footer {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 24px;
+  }
+  .footer a {
+    color: var(--teal-dark);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .footer a:hover { text-decoration: underline; }
+
+  .select-display-row {
+    margin-top: 16px;
+  }
+  .select-display-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.2px;
+    box-shadow: 0 2px 8px rgba(0, 128, 128, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  }
+  .select-display-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 128, 128, 0.35);
+    filter: brightness(1.05);
+  }
+  .select-display-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 128, 128, 0.25);
+  }
+  .select-display-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+  .select-display-arrow {
+    font-size: 16px;
+    line-height: 1;
+    transition: transform 0.15s ease;
+  }
+  .select-display-btn:hover .select-display-arrow {
+    transform: translateX(3px);
+  }
+
+  .copy-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .copy-row button {
+    flex: 1;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    background: white;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .copy-row button:hover { background: var(--teal-light); border-color: var(--teal); }
+  .copy-row button.primary {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+  .copy-row button.primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
+
+  /* Configuration SKU pill */
+  .sku-row {
+    align-items: center;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--line);
+  }
+  .sku-pill {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 16px;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+    font-size: 16px;
+    font-weight: 700;
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.15s, transform 0.1s;
+    text-align: left;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
+  }
+  .sku-pill #skuCode { letter-spacing: 1.2px; }
+  .sku-pill .sku-prefix {
+    letter-spacing: 1.2px;
+    color: #A4E8C9;
+  }
+  .sku-pill .sku-prefix:empty { display: none; }
+  .sku-prefix-hint {
+    grid-column: 2 / -1;
+    font-size: 11px;
+    color: var(--ink-3, #6B7C7B);
+    margin-top: 4px;
+    padding-left: 2px;
+    line-height: 1.5;
+  }
+  .sku-prefix-hint a { color: var(--ink-2, #2A3433); text-decoration: underline; }
+  .sku-prefix-hint a:hover { color: var(--ink, #0A0A0A); }
+  .sku-poles {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    opacity: 0.78;
+    line-height: 1.3;
+  }
+  .sku-poles.warn { color: #FFD0D9; opacity: 0.95; }
+  .sku-row { align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .sku-row .label { padding-top: 8px; }
+  .sku-pill:hover { background: var(--teal-dark); }
+  .sku-pill:active { transform: scale(0.97); }
+  .sku-pill .copy-hint {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    opacity: 0.55;
+    margin-left: 2px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  /* Recommendations */
+  .rec-list { display: grid; gap: 12px; padding-top: 8px; }
+  .rec {
+    position: relative;
+    padding: 14px 16px;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    text-align: left;
+    font-family: inherit;
+    width: 100%;
+  }
+  .rec:hover {
+    border-color: var(--teal);
+    background: white;
+    transform: translateY(-1px);
+  }
+  .rec.best {
+    border-color: var(--teal);
+    background: var(--teal-light);
+  }
+  .rec.best::before {
+    content: "BEST FIT";
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    background: var(--teal);
+    color: white;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+  .rec-info .title {
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .rec-info .meta {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .rec-fill { text-align: right; }
+  .rec-fill .pct {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .rec-fill .pct-label {
+    font-size: 10.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .rec-empty {
+    padding: 22px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1.5px dashed var(--line);
+  }
+  .rec-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* Ceiling mount explainer diagram */
+  .ceiling-diagram {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .ceiling-diagram-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+  }
+  .ceiling-diagram svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .ceiling-legend {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .ceiling-legend .leg-item {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 10px;
+    align-items: start;
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+  .ceiling-legend .leg-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ceiling-legend .leg-item.optional .leg-num { background: var(--brand-red); }
+  .ceiling-legend .leg-text strong { color: var(--ink); font-weight: 700; }
+  .ceiling-legend .leg-desc {
+    color: var(--muted);
+    font-size: 11.5px;
+    display: block;
+    margin-top: 2px;
+  }
+  .leg-flag {
+    display: inline-block;
+    font-size: 9.5px;
+    color: var(--brand-red);
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    margin-left: 4px;
+    vertical-align: 1px;
+  }
+  .field-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    margin-right: 6px;
+    vertical-align: 1px;
+  }
+  .field-num.optional { background: var(--brand-red); }
+  /* Ceiling mounting surface selector */
+  .surface-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .surface-card {
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    padding: 0 0 8px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: center;
+    overflow: hidden;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  }
+  .surface-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    background: var(--bg);
+    display: block;
+    margin-bottom: 7px;
+  }
+  .surface-card span {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    display: block;
+    padding: 0 6px;
+  }
+  .surface-card:hover { border-color: var(--teal); transform: translateY(-1px); }
+  .surface-card.selected { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+  .surface-card.selected span { color: var(--teal-dark); }
+
+  /* Drop-ceiling example illustration next to the ceiling-height input */
+  .ceiling-sample {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+  .ceiling-sample img {
+    width: 110px;
+    height: 74px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: block;
+  }
+  .ceiling-sample-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .ceiling-sample-text strong {
+    display: block;
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  /* ------------------------------------------------------------------
+     Print summary — clean printable view that combines the calculator
+     summary with the screen-selector summary (read from localStorage).
+     Hidden on screen, becomes the only visible content when printing.
+     ------------------------------------------------------------------ */
+  @media screen { #print-area { display: none !important; } }
+  @media print {
+    body > *:not(#print-area) { display: none !important; }
+    #print-area { display: block !important; padding: 0; margin: 0; }
+    .print-doc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #0A0A0A; padding: 32px 36px; max-width: 7.5in; margin: 0 auto; }
+    .print-doc .print-header { display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #0A0A0A; padding-bottom: 12px; margin-bottom: 18px; }
+    .print-doc .print-header img { height: 28px; width: auto; }
+    .print-doc .print-header .print-title { font-size: 16px; font-weight: 700; letter-spacing: 0.4px; }
+    .print-doc .print-header .print-date { margin-left: auto; font-size: 11px; color: #555; }
+    .print-block { page-break-inside: avoid; margin-bottom: 22px; }
+    .print-block h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0A0A0A; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin: 16px 0 10px; }
+    .print-block h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #444; margin: 12px 0 6px; }
+    .print-kv { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .print-kv td { padding: 4px 6px; vertical-align: top; border-bottom: 1px dotted #ddd; }
+    .print-kv td:first-child { color: #555; width: 38%; }
+    .print-kv td:last-child { font-weight: 600; }
+    .print-kv td .sku { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace; letter-spacing: 0.5px; }
+    .print-missing { font-size: 11px; color: #888; font-style: italic; padding: 8px 0; }
+    .print-footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 10px; color: #777; }
+    @page { margin: 0.5in; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <a href="https://vistifyinc.com" target="_blank" rel="noopener" aria-label="Visit Vistify website">
+      <img src="assets/brand/vistify-wordmark.png" alt="Vistify">
+    </a>
+  </div>
+  <div class="divider"></div>
+  <div class="product-name">Digital&nbsp;Menu&nbsp;Board Measurement&nbsp;Calculator&nbsp;Tool</div>
+  <a class="back-to-selector" href="screen-selector.html" aria-label="Back to Display Selector">
+    <span aria-hidden="true">&larr;</span>&nbsp;Back to Display Selector
+  </a>
+</header>
+
+<main class="container">
+
+  <!-- INPUTS -->
+  <div>
+    <div class="card card-space">
+      <h2><span class="badge">1</span> Available space <span class="tag muted">Optional</span></h2>
+      <div class="rec-hint" style="margin-bottom:18px;">Enter the wall area or vertical clearance the array needs to fit within — we'll suggest the best-fitting screen combinations.</div>
+
+      <div class="field">
+        <label for="spaceWidth">Available width</label>
+        <div class="stepper">
+          <button type="button" onclick="stepInput('spaceWidth', -1)">−</button>
+          <input type="number" id="spaceWidth" value="" min="0" step="0.5" placeholder="inches">
+          <button type="button" onclick="stepInput('spaceWidth', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="spaceHeight">Available height</label>
+        <div class="stepper">
+          <button type="button" onclick="stepInput('spaceHeight', -1)">−</button>
+          <input type="number" id="spaceHeight" value="" min="0" step="0.5" placeholder="inches">
+          <button type="button" onclick="stepInput('spaceHeight', 1)">+</button>
+        </div>
+        <div id="spaceHeightOverride" class="override-chip hide"></div>
+      </div>
+    </div>
+
+    <div class="card card-display">
+      <h2><span class="badge">2</span> Display configuration</h2>
+
+      <div class="field">
+        <label for="screenSize">Screen size</label>
+        <select id="screenSize">
+          <option value="32">32"</option>
+          <option value="43">43"</option>
+          <option value="50">50"</option>
+          <option value="55" selected>55"</option>
+          <option value="65">65"</option>
+          <option value="75">75"</option>
+        </select>
+        <div class="hint">Commercial LFD displays (Samsung, TCL, Sony)</div>
+      </div>
+
+      <div class="field">
+        <label>Orientation</label>
+        <div class="segmented" id="orientation">
+          <button type="button" data-value="landscape" class="active">Landscape</button>
+          <button type="button" data-value="portrait">Portrait</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="screenCount">Number of screens (edge to edge)</label>
+        <div class="stepper">
+          <button type="button" onclick="stepCount(-1)">−</button>
+          <input type="number" id="screenCount" value="3" min="1" max="8">
+          <button type="button" onclick="stepCount(1)">+</button>
+        </div>
+        <div class="hint">Screens are tiled horizontally in a single row</div>
+      </div>
+    </div>
+
+    <div class="card card-mount">
+      <h2><span class="badge">3</span> Mount type</h2>
+
+      <div class="field">
+        <div class="segmented" id="mountType">
+          <button type="button" data-value="wall" class="active">Wall mount</button>
+          <button type="button" data-value="ceiling">Ceiling mount</button>
+        </div>
+        <div class="hint">Wall = standard VESA wall mount · Ceiling = suspended pole mount</div>
+      </div>
+
+      <div id="ceilingInputs" class="hide">
+        <div class="ceiling-diagram">
+          <div class="ceiling-diagram-title">Ceiling mount — Required measurements</div>
+          <svg viewBox="0 0 460 320" xmlns="http://www.w3.org/2000/svg" aria-label="Ceiling mount measurement diagram">
+            <!-- Above-ceiling space (pink band, optional zone) -->
+            <rect x="20" y="54" width="420" height="46" fill="#FDECEC"/>
+            <!-- Structural ceiling (top, dark green) -->
+            <rect x="20" y="40" width="420" height="14" fill="#2BB673"/>
+            <!-- Drop ceiling (lighter mint band) -->
+            <rect x="20" y="100" width="420" height="14" fill="#A4E8C9"/>
+            <!-- Floor band -->
+            <rect x="20" y="298" width="420" height="14" fill="#A4E8C9"/>
+
+            <!-- Optional zone label -->
+            <text x="230" y="83" text-anchor="middle" font-size="9.5" font-weight="600" fill="#E63962" font-family="-apple-system, sans-serif" letter-spacing="0.5">ABOVE-CEILING SPACE (OPTIONAL)</text>
+
+            <!-- Mount plates (gray ellipses) -->
+            <ellipse cx="130" cy="114" rx="12" ry="3" fill="#6B7C7B"/>
+            <ellipse cx="230" cy="100" rx="12" ry="3" fill="#6B7C7B"/>
+            <ellipse cx="330" cy="54" rx="12" ry="3" fill="#6B7C7B"/>
+
+            <!-- Poles -->
+            <line x1="130" y1="114" x2="130" y2="160" stroke="#0A0A0A" stroke-width="3"/>
+            <line x1="230" y1="100" x2="230" y2="160" stroke="#0A0A0A" stroke-width="3"/>
+            <line x1="330" y1="54" x2="330" y2="160" stroke="#0A0A0A" stroke-width="3"/>
+
+            <!-- Menu boards (3 displays) -->
+            <rect x="100" y="160" width="60" height="40" fill="#2BB673" stroke="#0A0A0A" stroke-width="1.5" rx="2"/>
+            <text x="130" y="185" text-anchor="middle" fill="white" font-size="11" font-weight="700" font-family="-apple-system, sans-serif">Menu</text>
+            <rect x="200" y="160" width="60" height="40" fill="#2BB673" stroke="#0A0A0A" stroke-width="1.5" rx="2"/>
+            <text x="230" y="185" text-anchor="middle" fill="white" font-size="11" font-weight="700" font-family="-apple-system, sans-serif">Menu</text>
+            <rect x="300" y="160" width="60" height="40" fill="#2BB673" stroke="#0A0A0A" stroke-width="1.5" rx="2"/>
+            <text x="330" y="185" text-anchor="middle" fill="white" font-size="11" font-weight="700" font-family="-apple-system, sans-serif">Menu</text>
+
+            <!-- Person silhouette (right side, for scale) -->
+            <g transform="translate(410, 230)" fill="none" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="0" cy="0" r="7" fill="white"/>
+              <line x1="0" y1="7" x2="0" y2="34"/>
+              <line x1="-8" y1="18" x2="8" y2="18"/>
+              <line x1="0" y1="34" x2="-7" y2="65"/>
+              <line x1="0" y1="34" x2="7" y2="65"/>
+            </g>
+
+            <!-- DIMENSION 1: Floor to Mounting Surface -->
+            <line x1="48" y1="54" x2="48" y2="298" stroke="#0A0A0A" stroke-width="1.2"/>
+            <polygon points="48,54 44,64 52,64" fill="#0A0A0A"/>
+            <polygon points="48,298 44,288 52,288" fill="#0A0A0A"/>
+            <circle cx="48" cy="180" r="13" fill="#2BB673" stroke="white" stroke-width="2"/>
+            <text x="48" y="184" text-anchor="middle" fill="white" font-size="13" font-weight="700" font-family="-apple-system, sans-serif">1</text>
+
+            <!-- DIMENSION 2: Floor to Ceiling (optional - dashed red) -->
+            <line x1="180" y1="114" x2="180" y2="298" stroke="#E63962" stroke-width="1.2" stroke-dasharray="4,3"/>
+            <polygon points="180,114 176,124 184,124" fill="#E63962"/>
+            <polygon points="180,298 176,288 184,288" fill="#E63962"/>
+            <circle cx="180" cy="210" r="13" fill="#E63962" stroke="white" stroke-width="2"/>
+            <text x="180" y="214" text-anchor="middle" fill="white" font-size="13" font-weight="700" font-family="-apple-system, sans-serif">2</text>
+
+            <!-- DIMENSION 3: Head Clearance -->
+            <line x1="278" y1="200" x2="278" y2="298" stroke="#0A0A0A" stroke-width="1.2"/>
+            <polygon points="278,200 274,210 282,210" fill="#0A0A0A"/>
+            <polygon points="278,298 274,288 282,288" fill="#0A0A0A"/>
+            <circle cx="278" cy="252" r="13" fill="#2BB673" stroke="white" stroke-width="2"/>
+            <text x="278" y="256" text-anchor="middle" fill="white" font-size="13" font-weight="700" font-family="-apple-system, sans-serif">3</text>
+          </svg>
+          <div class="ceiling-legend">
+            <div class="leg-item">
+              <div class="leg-num">1</div>
+              <div class="leg-text"><strong>Floor to Mounting Surface</strong><span class="leg-desc">Height to the structural surface where the pole attaches.</span></div>
+            </div>
+            <div class="leg-item optional">
+              <div class="leg-num">2</div>
+              <div class="leg-text"><strong>Floor to Ceiling</strong><span class="leg-flag">OPTIONAL</span><span class="leg-desc">Only fill in if a drop ceiling sits below the mounting surface.</span></div>
+            </div>
+            <div class="leg-item">
+              <div class="leg-num">3</div>
+              <div class="leg-text"><strong>Head Clearance</strong><span class="leg-desc">Floor to bottom edge of screen. 80" minimum per OSHA.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="mountSurface"><span class="field-num">1</span>Floor to mounting surface height</label>
+          <div class="stepper">
+            <button type="button" onclick="stepInput('mountSurface', -1)">−</button>
+            <input type="number" id="mountSurface" value="120" min="0" step="0.5">
+            <button type="button" onclick="stepInput('mountSurface', 1)">+</button>
+          </div>
+          <div class="hint">Height to structural surface where the pole attaches (inches)</div>
+        </div>
+
+        <div class="field">
+          <label for="ceilingHeight"><span class="field-num optional">2</span>Floor to ceiling height <span class="tag muted">Optional</span></label>
+          <div class="stepper">
+            <button type="button" onclick="stepInput('ceilingHeight', -1)">−</button>
+            <input type="number" id="ceilingHeight" value="" min="0" step="0.5" placeholder="Same as mounting surface">
+            <button type="button" onclick="stepInput('ceilingHeight', 1)">+</button>
+          </div>
+          <div class="ceiling-sample">
+            <img src="assets/mount-surfaces/drop-ceiling.jpg" alt="Drop ceiling example" loading="lazy">
+            <div class="ceiling-sample-text">
+              <strong>Example: drop ceiling</strong>
+              <span>Only fill in if a drop ceiling sits below the structural mounting surface</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="headClearance"><span class="field-num">3</span>Floor to bottom of screen (head clearance)</label>
+          <div class="stepper">
+            <button type="button" onclick="stepInput('headClearance', -1)">−</button>
+            <input type="number" id="headClearance" value="80" min="0" step="0.5">
+            <button type="button" onclick="stepInput('headClearance', 1)">+</button>
+          </div>
+          <div class="hint">80" minimum is the standard OSHA head clearance</div>
+        </div>
+        <div class="field">
+          <label>Ceiling mounting surface</label>
+          <div class="surface-grid" id="surfaceGrid">
+            <button type="button" class="surface-card" data-value="Direct to I-Beam">
+              <img src="assets/mount-surfaces/direct-to-i-beam.jpg" alt="Direct to I-Beam" loading="lazy">
+              <span>Direct to I-Beam</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Direct to Wood Beam">
+              <img src="assets/mount-surfaces/direct-to-wood-beam.jpg" alt="Direct to Wood Beam" loading="lazy">
+              <span>Direct to Wood Beam</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Flush Mount Backed Surface">
+              <img src="assets/mount-surfaces/flush-mount-backed-surface.jpg" alt="Flush Mount Backed Surface" loading="lazy">
+              <span>Flush Mount Backed Surface</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Framed Sub-Ceiling 14-gauge Strut">
+              <img src="assets/mount-surfaces/framed-sub-ceiling-14-gauge-strut.jpg" alt="Framed Sub-Ceiling 14-gauge Strut" loading="lazy">
+              <span>Framed Sub-Ceiling 14-gauge Strut</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Spanning I-Beams 14-gauge Strut">
+              <img src="assets/mount-surfaces/spanning-i-beams-14-gauge-strut.jpg" alt="Spanning I-Beams 14-gauge Strut" loading="lazy">
+              <span>Spanning I-Beams 14-gauge Strut</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Spanning Single 12-gauge Strut">
+              <img src="assets/mount-surfaces/spanning-single-12-gauge-strut.jpg" alt="Spanning Single 12-gauge Strut" loading="lazy">
+              <span>Spanning Single 12-gauge Strut</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Spanning Wood Beams 14-gauge Strut">
+              <img src="assets/mount-surfaces/spanning-wood-beams-14-gauge-strut.jpg" alt="Spanning Wood Beams 14-gauge Strut" loading="lazy">
+              <span>Spanning Wood Beams 14-gauge Strut</span>
+            </button>
+          </div>
+          <div class="hint">How the pole attaches to the building structure — click again to deselect</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div>
+    <div class="card card-suggested" id="recCard" style="display:none;">
+      <h2><span class="badge">★</span> Suggested combinations</h2>
+      <div class="rec-hint">Ranked by how much of your available space they fill. Click any option to apply it.</div>
+      <div id="recList" class="rec-list"></div>
+    </div>
+
+    <div class="card card-results">
+      <h2><span class="badge">✓</span> Results</h2>
+
+      <div class="visual">
+        <svg id="diagram" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;"></svg>
+      </div>
+
+      <div class="diagram-note">
+        <span class="icon">i</span>
+        <div><strong>Note:</strong> 1.5" minimum clearance between the top edge of screen and the ceiling is recommended.</div>
+      </div>
+
+      <div class="result-row hero">
+        <div>
+          <div class="label">Overall array dimensions</div>
+          <span id="orientTag" class="tag" style="margin-top:6px;">Landscape</span>
+        </div>
+        <div class="value">
+          <span id="overallW">—</span> × <span id="overallH">—</span><span class="unit">in</span>
+        </div>
+      </div>
+
+      <div class="result-row">
+        <div class="label">In feet</div>
+        <div class="value"><span id="overallWft">—</span> × <span id="overallHft">—</span><span class="unit">ft</span></div>
+      </div>
+
+      <div class="result-row">
+        <div class="label">Per-screen dimensions</div>
+        <div class="value"><span id="screenW">—</span> × <span id="screenH">—</span><span class="unit">in</span></div>
+      </div>
+
+      <div class="result-row sku-row">
+        <div class="label">Configuration SKU</div>
+        <button type="button" id="skuPill" class="sku-pill" onclick="copySku()" title="Click to copy">
+          <span id="skuPrefix" class="sku-prefix"></span><span id="skuCode">—</span>
+          <span id="skuPoles" class="sku-poles"></span>
+          <span class="copy-hint">COPY</span>
+        </button>
+      </div>
+      <div id="skuPrefixHint" class="sku-prefix-hint hide">
+        Prefix from <strong id="skuPrefixName">Screen Selector</strong> &middot;
+        <a href="screen-selector.html">change</a> &middot;
+        <a href="#" id="skuPrefixClear">clear</a>
+      </div>
+
+      <div id="ceilingResults" class="hide">
+        <div class="result-row hero" style="margin-top:12px;">
+          <div class="label">Minimum pole length</div>
+          <div class="value"><span id="poleLength">—</span><span class="unit">in</span></div>
+        </div>
+        <div id="clearanceAlert"></div>
+      </div>
+
+      <div class="select-display-row">
+        <a href="screen-selector.html" class="select-display-btn">
+          <span class="select-display-icon" aria-hidden="true">&#9636;</span>
+          Select Display Brand &amp; Model
+          <span class="select-display-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+
+      <div class="copy-row">
+        <button type="button" onclick="copySummary()" class="primary" id="copyBtn">Copy summary</button>
+        <button type="button" onclick="printSummary()">Print</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  Ready to order? Email: <a href="mailto:sales@vistifyinc.com">sales@vistifyinc.com</a> or Call: <a href="tel:+19492320070">(949)&nbsp;232-0070</a>
+</footer>
+
+<script>
+  // Vistify commercial LFD dimensions in inches (native landscape orientation)
+  // Source: Vistify Digital Menu Board Measurement Calculator spec sheet
+  const DISPLAYS = {
+    32: { h: 16.6,  w: 28.63 },
+    43: { h: 22.0,  w: 38.20 },
+    50: { h: 25.4,  w: 44.30 },
+    55: { h: 27.9,  w: 48.70 },
+    65: { h: 32.8,  w: 57.40 },
+    75: { h: 37.82, w: 66.24 }
+  };
+
+  // Ceiling-mount hardware allowance (VESA bracket + ceiling plate), inches
+  const HARDWARE_INCHES = 7.5;
+
+  const state = {
+    size: 55,
+    orientation: 'landscape',
+    count: 3,
+    mountType: 'wall',
+    mountSurfaceType: '',
+    mountSurface: 120,
+    ceilingHeight: '',
+    headClearance: 80,
+    spaceWidth: '',
+    spaceHeight: ''
+  };
+
+  // Segmented controls
+  document.querySelectorAll('.segmented').forEach(group => {
+    group.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (group.id === 'orientation') state.orientation = btn.dataset.value;
+        if (group.id === 'mountType') {
+          state.mountType = btn.dataset.value;
+          const showCeiling = state.mountType === 'ceiling';
+          document.getElementById('ceilingInputs').classList.toggle('hide', !showCeiling);
+          document.getElementById('ceilingResults').classList.toggle('hide', !showCeiling);
+        }
+        compute();
+      });
+    });
+  });
+
+  document.getElementById('screenSize').addEventListener('change', e => {
+    state.size = parseInt(e.target.value, 10);
+    compute();
+  });
+  document.getElementById('screenCount').addEventListener('input', e => {
+    const v = parseInt(e.target.value, 10);
+    state.count = isNaN(v) ? 1 : Math.max(1, Math.min(8, v));
+    compute();
+  });
+  ['mountSurface', 'ceilingHeight', 'headClearance', 'spaceWidth', 'spaceHeight'].forEach(id => {
+    document.getElementById(id).addEventListener('input', e => {
+      state[id] = e.target.value === '' ? '' : parseFloat(e.target.value);
+      compute();
+    });
+  });
+
+  // Ceiling mounting surface selector — click to select, click again to deselect.
+  function renderSurfaceSelection() {
+    document.querySelectorAll('#surfaceGrid .surface-card').forEach(function (c) {
+      c.classList.toggle('selected', c.dataset.value === state.mountSurfaceType);
+    });
+  }
+  document.querySelectorAll('#surfaceGrid .surface-card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      const val = card.dataset.value;
+      state.mountSurfaceType = (state.mountSurfaceType === val) ? '' : val;
+      renderSurfaceSelection();
+      compute();
+    });
+  });
+
+  function stepCount(d) {
+    const el = document.getElementById('screenCount');
+    const newVal = Math.max(1, Math.min(8, (parseInt(el.value, 10) || 1) + d));
+    el.value = newVal;
+    state.count = newVal;
+    compute();
+  }
+
+  function stepInput(id, d) {
+    const el = document.getElementById(id);
+    const cur = parseFloat(el.value);
+    const base = isNaN(cur) ? 0 : cur;
+    const next = Math.max(0, base + d);
+    el.value = next;
+    state[id] = next;
+    compute();
+  }
+
+  function compute() {
+    const d = DISPLAYS[state.size];
+    // In landscape: long side horizontal → W = d.w, H = d.h
+    // In portrait: long side vertical → W = d.h, H = d.w
+    const perScreenW = state.orientation === 'landscape' ? d.w : d.h;
+    const perScreenH = state.orientation === 'landscape' ? d.h : d.w;
+    const overallW = perScreenW * state.count;
+    const overallH = perScreenH;
+
+    document.getElementById('screenW').textContent = perScreenW.toFixed(1);
+    document.getElementById('screenH').textContent = perScreenH.toFixed(1);
+    document.getElementById('overallW').textContent = overallW.toFixed(1);
+    document.getElementById('overallH').textContent = overallH.toFixed(1);
+    document.getElementById('overallWft').textContent = (overallW / 12).toFixed(2);
+    document.getElementById('overallHft').textContent = (overallH / 12).toFixed(2);
+    document.getElementById('orientTag').textContent =
+      state.orientation === 'landscape' ? 'Landscape' : 'Portrait';
+
+    // Ceiling math
+    if (state.mountType === 'ceiling') {
+      const mountSurface = parseFloat(state.mountSurface) || 0;
+      const ceiling = (state.ceilingHeight === '' || state.ceilingHeight == null)
+        ? 0 : parseFloat(state.ceilingHeight);
+      const head = parseFloat(state.headClearance) || 0;
+
+      // Pole length = mountSurface − (head + perScreenH/2 + hardware)
+      const poleLength = mountSurface - (head + perScreenH / 2 + HARDWARE_INCHES);
+      document.getElementById('poleLength').textContent = poleLength.toFixed(1);
+
+      const status = getClearanceStatus();
+      const alertEl = document.getElementById('clearanceAlert');
+      const limitLabel =
+        status.limitName + ' (' + status.limitBase.toFixed(1) + '") minus the recommended 1.5" clearance';
+      if (status.errorType === 'pole') {
+        alertEl.innerHTML =
+          '<div class="alert warn"><span class="icon">!</span><div>' +
+          '<strong>Clearance error:</strong> mounting surface is too low for this configuration. ' +
+          'Pole length is negative (' + status.poleLength.toFixed(1) + '"). Raise the mounting surface or lower the head clearance.' +
+          '</div></div>';
+      } else if (status.errorType === 'missing') {
+        alertEl.innerHTML =
+          '<div class="alert warn"><span class="icon">!</span><div>' +
+          '<strong>Clearance error:</strong> enter a mounting surface or ceiling height to verify clearance.' +
+          '</div></div>';
+      } else if (status.errorType === 'overhead') {
+        alertEl.innerHTML =
+          '<div class="alert warn"><span class="icon">!</span><div>' +
+          '<strong>Clearance error:</strong> top of screen (' + status.topOfScreen.toFixed(1) + '") exceeds ' +
+          limitLabel + ' = ' + status.effectiveLimit.toFixed(1) + '".' +
+          '</div></div>';
+      } else {
+        const actualSlack = status.limitBase - status.topOfScreen;
+        const okMsg =
+          'Fitment is clear. Top of screen sits at ' + status.topOfScreen.toFixed(1) + '" with ' +
+          actualSlack.toFixed(1) + '" of clearance to the ' + status.limitName +
+          ', which provides more than the 1.5" recommended minimum.';
+        alertEl.innerHTML =
+          '<div class="alert ok"><span class="icon">✓</span><div>' + okMsg + '</div></div>';
+      }
+    }
+
+    // Visual warning state on the diagram container — persists until resolved
+    const visualEl = document.querySelector('.card-results .visual');
+    if (visualEl) {
+      const ceilingClearance = getClearanceStatus();
+      visualEl.classList.toggle('warn', !ceilingClearance.ok);
+    }
+
+    const baseSku = computeSku();
+    const poleSuffix = getPoleSuffix();
+    const prefix = getSkuPrefix();
+    document.getElementById('skuCode').textContent = baseSku;
+    const prefixEl = document.getElementById('skuPrefix');
+    if (prefixEl) prefixEl.textContent = prefix;
+    const polesEl = document.getElementById('skuPoles');
+    if (polesEl) {
+      polesEl.textContent = poleSuffix;
+      polesEl.classList.toggle('warn', /exceeds|below/.test(poleSuffix));
+    }
+    // Publish the computed SKU body for the sibling Screen Selector page,
+    // so its SKU pill can display the full combined SKU too.
+    saveSkuBody(baseSku);
+    // Persist the full calculator configuration so navigating away and back
+    // restores the user's inputs exactly.
+    saveCalcState();
+    // Persist the full text + HTML summary so the selector's Copy/Print can
+    // include the calculator config in its combined output.
+    saveCalcSummaryToStorage();
+    renderSkuPrefixHint();
+    drawDiagram(perScreenW, perScreenH, state.count);
+    updateRecommendations();
+    updateOverrideChip();
+  }
+
+  // Returns the ceiling-mount clearance status. Used by compute() to render the
+  // alert and by drawCeilingElevation() to overlay a warning on the diagram.
+  // Returns { ok, errorType, topOfScreen, effectiveLimit, ceiling, mountSurface,
+  //           ceilingTighter, poleLength } where errorType is one of:
+  //   'none' | 'pole' | 'missing' | 'overhead'
+  // Strong Mount ceiling pole catalog (per Strong Mount Pole Accessories.xlsx)
+  const POLE_ADJ = [
+    { model: 'SM-ADJPOLE-9-BLK',  min: 6,  max: 9  },
+    { model: 'SM-ADJPOLE-12-BLK', min: 9,  max: 12 },
+    { model: 'SM-ADJPOLE-18-BLK', min: 12, max: 18 },
+    { model: 'SM-ADJPOLE-24-BLK', min: 18, max: 24 },
+    { model: 'SM-ADJPOLE-36-BLK', min: 24, max: 36 },
+    { model: 'SM-ADJPOLE-48-BLK', min: 36, max: 48 }
+  ];
+  const POLE_FIX = [
+    { model: 'SM-FIXPOLE-3-BLK',  len: 3  },
+    { model: 'SM-FIXPOLE-6-BLK',  len: 6  },
+    { model: 'SM-FIXPOLE-12-BLK', len: 12 },
+    { model: 'SM-FIXPOLE-24-BLK', len: 24 },
+    { model: 'SM-FIXPOLE-36-BLK', len: 36 },
+    { model: 'SM-FIXPOLE-48-BLK', len: 48 },
+    { model: 'SM-FIXPOLE-60-BLK', len: 60 }
+  ];
+  const POLE_COUPLER = { model: 'SM-CEILING-FFC-BLK', len: 1 };
+  const POLE_MAX_TOTAL = 170;
+
+  // Choose the simplest pole assembly that brackets the required length L.
+  // Returns { poles: [model,...], assemblyMin, assemblyMax, parts } or { error, ... }.
+  // Default is a single adjustable pole; up to 2 fixed poles + 2 couplers can be added.
+  function selectPoles(L) {
+    if (!isFinite(L) || L <= 0)        return { error: 'invalid',   poles: [] };
+    if (L > POLE_MAX_TOTAL)            return { error: 'too_long',  max: POLE_MAX_TOTAL, poles: [] };
+    if (L < POLE_ADJ[0].min)           return { error: 'too_short', min: POLE_ADJ[0].min, poles: [] };
+    // 1) Single adjustable pole
+    for (let i = 0; i < POLE_ADJ.length; i++) {
+      const a = POLE_ADJ[i];
+      if (L >= a.min && L <= a.max) {
+        return { poles: [a.model], assemblyMin: a.min, assemblyMax: a.max, parts: 1 };
+      }
+    }
+    // 2) 1 adjustable + 1 coupler + 1 fixed
+    let best = null;
+    for (let i = 0; i < POLE_ADJ.length; i++) {
+      for (let j = 0; j < POLE_FIX.length; j++) {
+        const a = POLE_ADJ[i], f = POLE_FIX[j];
+        const lo = a.min + POLE_COUPLER.len + f.len;
+        const hi = a.max + POLE_COUPLER.len + f.len;
+        if (hi > POLE_MAX_TOTAL) continue;
+        if (L >= lo && L <= hi) {
+          const dist = Math.abs(L - (lo + hi) / 2);
+          if (!best || dist < best.dist) {
+            best = { dist, poles: [a.model, POLE_COUPLER.model, f.model], assemblyMin: lo, assemblyMax: hi, parts: 3 };
+          }
+        }
+      }
+    }
+    if (best) { delete best.dist; return best; }
+    // 3) 1 adjustable + 2 couplers + 2 fixed
+    for (let i = 0; i < POLE_ADJ.length; i++) {
+      for (let p = 0; p < POLE_FIX.length; p++) {
+        for (let q = 0; q <= p; q++) {
+          const a = POLE_ADJ[i], f1 = POLE_FIX[p], f2 = POLE_FIX[q];
+          const lo = a.min + 2 * POLE_COUPLER.len + f1.len + f2.len;
+          const hi = a.max + 2 * POLE_COUPLER.len + f1.len + f2.len;
+          if (hi > POLE_MAX_TOTAL) continue;
+          if (L >= lo && L <= hi) {
+            const dist = Math.abs(L - (lo + hi) / 2);
+            if (!best || dist < best.dist) {
+              best = { dist, poles: [a.model, POLE_COUPLER.model, f1.model, POLE_COUPLER.model, f2.model], assemblyMin: lo, assemblyMax: hi, parts: 5 };
+            }
+          }
+        }
+      }
+    }
+    if (best) { delete best.dist; return best; }
+    return { error: 'no_combo', poles: [] };
+  }
+
+  // Return a parens-wrapped suffix listing required ceiling pole models for the current
+  // configuration, or '' if not applicable (wall mount or clearance error).
+  function getPoleSuffix() {
+    if (state.mountType !== 'ceiling') return '';
+    const status = getClearanceStatus();
+    // If pole length math is degenerate (pole error or missing inputs), don't claim pole models.
+    if (status.errorType === 'pole' || status.errorType === 'missing') return '';
+    const d = DISPLAYS[state.size];
+    const perScreenH = state.orientation === 'landscape' ? d.h : d.w;
+    const mountSurface = parseFloat(state.mountSurface) || 0;
+    const head = parseFloat(state.headClearance) || 0;
+    const poleLength = mountSurface - (head + perScreenH / 2 + HARDWARE_INCHES);
+    const sel = selectPoles(poleLength);
+    if (sel.error === 'too_long')  return '(pole length ' + poleLength.toFixed(1) + '" exceeds ' + POLE_MAX_TOTAL + '" max — no compatible assembly)';
+    if (sel.error === 'too_short') return '(pole length ' + poleLength.toFixed(1) + '" below ' + sel.min + '" minimum)';
+    if (sel.error || !sel.poles.length) return '';
+    return '(' + sel.poles.join(', ') + ')';
+  }
+
+  function computeSku() {
+    const mountChar = state.mountType === 'wall' ? 'W' : 'C';
+    const orientChar = state.orientation === 'landscape' ? 'L' : 'P';
+    return state.count + 'x' + state.size + mountChar + orientChar;
+  }
+
+  function copySku() {
+    const suffix = getPoleSuffix();
+    const prefix = getSkuPrefix();
+    const code = prefix + computeSku() + (suffix ? ' ' + suffix : '');
+    const pill = document.getElementById('skuPill');
+    if (!pill) return;
+    navigator.clipboard.writeText(code).then(function () {
+      const orig = pill.innerHTML;
+      pill.innerHTML = '<span style="letter-spacing:0.5px;">Copied ✓</span>';
+      setTimeout(function () { pill.innerHTML = orig; }, 1400);
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Sibling sync — read the SKU Prefix selected on the Screen Selector page.
+  // The Screen Selector writes `vistify.skuPrefix` to localStorage when a
+  // display is chosen; the calculator prepends it to the computed configuration
+  // SKU so the user gets a single combined SKU when both fields are populated.
+  // ---------------------------------------------------------------------------
+  const SKU_PREFIX_KEY = 'vistify.skuPrefix';
+  const SKU_PREFIX_NAME_KEY = 'vistify.skuPrefixName';
+  const SKU_BODY_KEY = 'vistify.skuBody';
+  const CALC_STATE_KEY = 'vistify.calcState';
+
+  // Persist the calculator's configuration object so navigating to the Screen
+  // Selector and back preserves the user's inputs (count, size, orientation,
+  // mount type, ceiling height, etc.). Called automatically from compute().
+  function saveCalcState() {
+    try { localStorage.setItem(CALC_STATE_KEY, JSON.stringify(state)); }
+    catch (e) { /* non-fatal */ }
+  }
+  function loadCalcState() {
+    try {
+      const raw = localStorage.getItem(CALC_STATE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  // Apply a previously-saved state object to both the in-memory `state` and
+  // the visible form controls so the UI matches what we restored.
+  function applyCalcStateToForm(s) {
+    if (!s || typeof s !== 'object') return;
+    // Whitelist of fields we know about — guards against unrelated keys.
+    ['size','orientation','count','mountType','mountSurfaceType','mountSurface','ceilingHeight','headClearance','spaceWidth','spaceHeight'].forEach(k => {
+      if (s[k] !== undefined) state[k] = s[k];
+    });
+    renderSurfaceSelection();
+    // <select> and <input> values
+    const sz = document.getElementById('screenSize');
+    if (sz) sz.value = String(state.size);
+    const cnt = document.getElementById('screenCount');
+    if (cnt) cnt.value = String(state.count);
+    ['mountSurface','ceilingHeight','headClearance','spaceWidth','spaceHeight'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = state[id] === '' || state[id] == null ? '' : String(state[id]);
+    });
+    // Segmented controls (orientation + mountType buttons)
+    const orientGroup = document.getElementById('orientation');
+    if (orientGroup) orientGroup.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === state.orientation);
+    });
+    const mountGroup = document.getElementById('mountType');
+    if (mountGroup) mountGroup.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === state.mountType);
+    });
+    // Show/hide ceiling-specific inputs to match restored mount type
+    const ceilingInputs  = document.getElementById('ceilingInputs');
+    const ceilingResults = document.getElementById('ceilingResults');
+    const showCeiling = state.mountType === 'ceiling';
+    if (ceilingInputs)  ceilingInputs.classList.toggle('hide', !showCeiling);
+    if (ceilingResults) ceilingResults.classList.toggle('hide', !showCeiling);
+  }
+
+  function getSkuPrefix() {
+    try { return localStorage.getItem(SKU_PREFIX_KEY) || ''; }
+    catch (e) { return ''; }
+  }
+  function getSkuPrefixName() {
+    try { return localStorage.getItem(SKU_PREFIX_NAME_KEY) || ''; }
+    catch (e) { return ''; }
+  }
+  function saveSkuBody(body) {
+    try {
+      if (body) localStorage.setItem(SKU_BODY_KEY, body);
+      else localStorage.removeItem(SKU_BODY_KEY);
+    } catch (e) { /* non-fatal */ }
+  }
+  function clearSkuPrefix() {
+    try {
+      localStorage.removeItem(SKU_PREFIX_KEY);
+      localStorage.removeItem(SKU_PREFIX_NAME_KEY);
+    } catch (e) { /* non-fatal */ }
+    compute();
+  }
+  function renderSkuPrefixHint() {
+    const hint = document.getElementById('skuPrefixHint');
+    if (!hint) return;
+    const prefix = getSkuPrefix();
+    if (prefix) {
+      hint.classList.remove('hide');
+      const nameEl = document.getElementById('skuPrefixName');
+      if (nameEl) nameEl.textContent = getSkuPrefixName() || 'Screen Selector';
+    } else {
+      hint.classList.add('hide');
+    }
+  }
+  // Re-render when the sibling page updates the prefix in another tab/window.
+  window.addEventListener('storage', function (e) {
+    if (e.key === SKU_PREFIX_KEY || e.key === SKU_PREFIX_NAME_KEY) compute();
+  });
+  // Wire the clear link.
+  document.addEventListener('DOMContentLoaded', function () {
+    const link = document.getElementById('skuPrefixClear');
+    if (link) link.addEventListener('click', function (e) {
+      e.preventDefault();
+      clearSkuPrefix();
+    });
+  });
+
+  function getClearanceStatus() {
+    if (state.mountType !== 'ceiling') {
+      return { ok: true, errorType: 'none' };
+    }
+    const d = DISPLAYS[state.size];
+    const perScreenH = state.orientation === 'landscape' ? d.h : d.w;
+    const mountSurface = parseFloat(state.mountSurface) || 0;
+    const ceiling = (state.ceilingHeight === '' || state.ceilingHeight == null) ? 0 : parseFloat(state.ceilingHeight);
+    const head = parseFloat(state.headClearance) || 0;
+    const poleLength = mountSurface - (head + perScreenH / 2 + HARDWARE_INCHES);
+    const topOfScreen = head + perScreenH;
+    // Apply the 1.5" recommended clearance to whichever upper surface bounds
+    // the screen top — the ceiling when entered, otherwise the mount surface
+    // (which acts as the effective ceiling in absence of an explicit value).
+    const ceilingLimit = ceiling > 0      ? ceiling      - 1.5 : Infinity;
+    const surfaceLimit = mountSurface > 0 ? mountSurface - 1.5 : Infinity;
+    const ceilingTighter = ceilingLimit < surfaceLimit;
+    const effectiveLimit = Math.min(ceilingLimit, surfaceLimit);
+    const limitBase = ceilingTighter ? ceiling : mountSurface;
+    const limitName = ceilingTighter ? 'ceiling' : 'mounting surface';
+    const base = { topOfScreen, effectiveLimit, ceiling, mountSurface, ceilingTighter, limitBase, limitName, poleLength, perScreenH, head };
+    if (poleLength < 0)               return Object.assign({ ok: false, errorType: 'pole' },     base);
+    if (!isFinite(effectiveLimit))    return Object.assign({ ok: false, errorType: 'missing' },  base);
+    if (topOfScreen > effectiveLimit) return Object.assign({ ok: false, errorType: 'overhead' }, base);
+    return Object.assign({ ok: true, errorType: 'none' }, base);
+  }
+
+  // Returns effective available height for the array. In ceiling mount, this is
+  // capped by whichever is tighter:
+  //   - (ceilingHeight - 1.5")  - headClearance, when a ceiling is entered
+  //   - mountSurfaceHeight       - headClearance, otherwise / additionally
+  // userH is preserved in state; this function never mutates inputs.
+  function getEffectiveSpaceInfo() {
+    const userH = parseFloat(state.spaceHeight);
+    const info = { userH: isNaN(userH) ? 0 : userH, effectiveH: isNaN(userH) ? 0 : userH, capped: false, maxH: 0, byLabel: '' };
+    if (isNaN(userH) || userH <= 0) return info;
+    if (state.mountType !== 'ceiling') return info;
+
+    const head = parseFloat(state.headClearance) || 0;
+    const ceiling = (state.ceilingHeight === '' || state.ceilingHeight == null) ? 0 : parseFloat(state.ceilingHeight);
+    const mountSurface = parseFloat(state.mountSurface) || 0;
+
+    const limits = [];
+    if (mountSurface > 0) limits.push({ value: mountSurface - 1.5, label: 'mounting surface (1.5" recommended clearance)' });
+    if (ceiling > 0)      limits.push({ value: ceiling      - 1.5, label: 'ceiling (1.5" recommended clearance)' });
+    if (limits.length === 0) return info;
+
+    limits.sort(function (a, b) { return a.value - b.value; });
+    const tightest = limits[0];
+    const maxH = tightest.value - head;
+    info.maxH = Math.max(0, maxH);
+    if (userH > maxH) {
+      info.capped = true;
+      info.effectiveH = Math.max(0, maxH);
+      info.byLabel = tightest.label;
+    }
+    return info;
+  }
+
+  function updateOverrideChip() {
+    const info = getEffectiveSpaceInfo();
+    const el = document.getElementById('spaceHeightOverride');
+    const input = document.getElementById('spaceHeight');
+    if (!el) return;
+    if (!info.capped) {
+      el.classList.add('hide');
+      el.innerHTML = '';
+      if (input) input.classList.remove('adjusted');
+      return;
+    }
+    el.classList.remove('hide');
+    el.innerHTML =
+      '<span class="icon">!</span>' +
+      '<div>Available height adjusted to <strong>' + info.effectiveH.toFixed(1) + '"</strong> ' +
+      '(you entered ' + info.userH.toFixed(1) + '") — limited by ' + info.byLabel +
+      ' minus head clearance.</div>';
+    if (input) input.classList.add('adjusted');
+  }
+
+  function drawDiagram(sw, sh, count) {
+    const svg = document.getElementById('diagram');
+    if (state.mountType === 'ceiling') {
+      drawCeilingElevation(svg, sw, sh, count);
+      return;
+    }
+    const viewW = 400, viewH = 240;
+    const padX = 50, padY = 40;
+    const maxW = viewW - padX * 2;
+    const maxH = viewH - padY * 2 - 30;
+
+    const totalW = sw * count;
+    const hasSpace = parseFloat(state.spaceWidth) > 0 && parseFloat(state.spaceHeight) > 0;
+    const spaceW = hasSpace ? parseFloat(state.spaceWidth) : 0;
+    const spaceH = hasSpace ? parseFloat(state.spaceHeight) : 0;
+
+    // Bounding box used for scale (use larger of space and array so both fit if array overflows)
+    const boundW = hasSpace ? Math.max(spaceW, totalW) : totalW;
+    const boundH = hasSpace ? Math.max(spaceH, sh) : sh;
+    const scale = Math.min(maxW / boundW, maxH / boundH);
+
+    const drawScreenW = sw * scale;
+    const drawScreenH = sh * scale;
+    const drawTotalW = drawScreenW * count;
+    const drawSpaceW = hasSpace ? spaceW * scale : drawTotalW;
+    const drawSpaceH = hasSpace ? spaceH * scale : drawScreenH;
+
+    const boundDrawW = Math.max(drawSpaceW, drawTotalW);
+    const startX = (viewW - boundDrawW) / 2;
+    const startY = padY;
+
+    // Space and array positions (array sits inside the space, horizontally centered)
+    // Vertical alignment: ceiling mount → bottom-aligned (gap above represents pole length to mounting surface);
+    // wall mount → vertically centered.
+    const spaceX = startX + (boundDrawW - drawSpaceW) / 2;
+    const spaceY = startY;
+    const arrayX = startX + (boundDrawW - drawTotalW) / 2;
+    let arrayY = startY;
+    if (hasSpace) {
+      if (state.mountType === 'ceiling') {
+        arrayY = spaceY + Math.max(0, drawSpaceH - drawScreenH);
+      } else {
+        arrayY = spaceY + Math.max(0, (drawSpaceH - drawScreenH) / 2);
+      }
+    }
+
+    // For dimensions, use whichever bound is being shown outside
+    const dimBoxX = hasSpace ? spaceX : arrayX;
+    const dimBoxY = startY;
+    const dimBoxW = hasSpace ? drawSpaceW : drawTotalW;
+    const dimBoxH = hasSpace ? drawSpaceH : drawScreenH;
+    const dimValueW = hasSpace ? spaceW : totalW;
+    const dimValueH = hasSpace ? spaceH : sh;
+
+    // 1. Available-space outline (dashed) — only when hasSpace
+    let spaceLayer = '';
+    if (hasSpace) {
+      const fillPct = Math.round(((totalW * sh) / (spaceW * spaceH)) * 100);
+      const overflows = totalW > spaceW + 0.01 || sh > spaceH + 0.01;
+      const outlineColor = overflows ? '#E63962' : '#1F9460';
+      const labelColor = overflows ? '#E63962' : '#1F9460';
+      const fillBg = overflows ? '#FDECEC' : '#DCF3E5';
+      spaceLayer +=
+        '<rect x="' + spaceX + '" y="' + spaceY + '" width="' + drawSpaceW + '" height="' + drawSpaceH + '" ' +
+        'fill="rgba(43,182,115,0.05)" stroke="' + outlineColor + '" stroke-width="1.5" stroke-dasharray="5,3" rx="3"/>' +
+        '<text x="' + (spaceX + 6) + '" y="' + (spaceY + 12) + '" font-size="9" fill="' + labelColor + '" ' +
+        'font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.5">AVAILABLE SPACE</text>' +
+        '<rect x="' + (spaceX + drawSpaceW - 64) + '" y="' + (spaceY + 3) + '" width="60" height="14" fill="' + fillBg + '" rx="2"/>' +
+        '<text x="' + (spaceX + drawSpaceW - 34) + '" y="' + (spaceY + 13) + '" text-anchor="middle" font-size="9" ' +
+        'fill="' + labelColor + '" font-weight="700" font-family="-apple-system, sans-serif">' + (overflows ? 'OVER ' : 'FILL ') + fillPct + '%</text>';
+    }
+
+    // 2. Display screens
+    let screens = '';
+    for (let i = 0; i < count; i++) {
+      const x = arrayX + i * drawScreenW;
+      screens +=
+        '<rect x="' + (x + 1) + '" y="' + (arrayY + 1) + '" width="' + (drawScreenW - 2) + '" height="' + (drawScreenH - 2) + '" ' +
+        'fill="#0A0A0A" stroke="#0A0A0A" stroke-width="2" rx="2"/>' +
+        '<rect x="' + (x + 4) + '" y="' + (arrayY + 4) + '" width="' + (drawScreenW - 8) + '" height="' + (drawScreenH - 8) + '" ' +
+        'fill="#2BB673" rx="1"/>' +
+        '<text x="' + (x + drawScreenW / 2) + '" y="' + (arrayY + drawScreenH / 2 + 4) + '" ' +
+        'text-anchor="middle" font-size="' + Math.min(13, drawScreenW * 0.18) + '" ' +
+        'fill="white" font-weight="700" font-family="-apple-system, sans-serif">' + state.size + '"</text>';
+    }
+
+    // 3. Outside width dimension (below the box being shown)
+    const dimY = dimBoxY + dimBoxH + 22;
+    const dim =
+      '<line x1="' + dimBoxX + '" y1="' + dimY + '" x2="' + (dimBoxX + dimBoxW) + '" y2="' + dimY + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<line x1="' + dimBoxX + '" y1="' + (dimY - 5) + '" x2="' + dimBoxX + '" y2="' + (dimY + 5) + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<line x1="' + (dimBoxX + dimBoxW) + '" y1="' + (dimY - 5) + '" x2="' + (dimBoxX + dimBoxW) + '" y2="' + (dimY + 5) + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<rect x="' + (dimBoxX + dimBoxW / 2 - 30) + '" y="' + (dimY + 6) + '" width="60" height="16" fill="#F5F9F8" rx="3"/>' +
+      '<text x="' + (dimBoxX + dimBoxW / 2) + '" y="' + (dimY + 17) + '" text-anchor="middle" font-size="11" ' +
+      'fill="#0F2622" font-weight="700" font-family="-apple-system, sans-serif">' + dimValueW.toFixed(1) + '"</text>';
+
+    // 4. Outside height dimension (rotated label, left of the box)
+    const hDimX = dimBoxX - 18;
+    const hMidY = dimBoxY + dimBoxH / 2;
+    const hLabelX = hDimX - 8;
+    const hDim =
+      '<line x1="' + hDimX + '" y1="' + dimBoxY + '" x2="' + hDimX + '" y2="' + (dimBoxY + dimBoxH) + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<line x1="' + (hDimX - 5) + '" y1="' + dimBoxY + '" x2="' + (hDimX + 5) + '" y2="' + dimBoxY + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<line x1="' + (hDimX - 5) + '" y1="' + (dimBoxY + dimBoxH) + '" x2="' + (hDimX + 5) + '" y2="' + (dimBoxY + dimBoxH) + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<g transform="translate(' + hLabelX + ' ' + hMidY + ') rotate(-90)">' +
+        '<rect x="-22" y="-8" width="44" height="16" fill="#F5F9F8" rx="3"/>' +
+        '<text x="0" y="4" text-anchor="middle" font-size="11" ' +
+        'fill="#0F2622" font-weight="700" font-family="-apple-system, sans-serif">' + dimValueH.toFixed(1) + '"</text>' +
+      '</g>';
+
+    // 5. Inline array-dimension badge (only when space is shown and there's room below the array)
+    let arrayBadge = '';
+    if (hasSpace) {
+      const badgeY = arrayY + drawScreenH + 12;
+      if (badgeY + 8 < dimY - 4) {
+        arrayBadge =
+          '<rect x="' + (arrayX + drawTotalW / 2 - 52) + '" y="' + (badgeY - 7) + '" width="104" height="15" fill="#0A0A0A" rx="2"/>' +
+          '<text x="' + (arrayX + drawTotalW / 2) + '" y="' + (badgeY + 4) + '" text-anchor="middle" font-size="9.5" ' +
+          'fill="white" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.3">ARRAY ' + totalW.toFixed(1) + '" × ' + sh.toFixed(1) + '"</text>';
+      }
+    }
+
+    // 6. Wall or ceiling visualization. When space is shown, the top of the space rectangle
+    //    represents the mounting surface — poles drop from there into the array. When no space
+    //    is shown, draw a free-floating ceiling/floor line for context.
+    let mountVis = '';
+    if (state.mountType === 'ceiling') {
+      const ceilingY = hasSpace ? spaceY + 2 : Math.max(8, startY - 22);
+      if (!hasSpace) {
+        mountVis +=
+          '<line x1="20" y1="' + ceilingY + '" x2="380" y2="' + ceilingY + '" stroke="#0A0A0A" stroke-width="2"/>' +
+          '<line x1="20" y1="' + (ceilingY - 4) + '" x2="20" y2="' + ceilingY + '" stroke="#0A0A0A" stroke-width="2"/>' +
+          '<line x1="380" y1="' + (ceilingY - 4) + '" x2="380" y2="' + ceilingY + '" stroke="#0A0A0A" stroke-width="2"/>';
+      }
+      for (let i = 0; i < count; i++) {
+        const cx = arrayX + i * drawScreenW + drawScreenW / 2;
+        if (arrayY > ceilingY) {
+          mountVis +=
+            '<line x1="' + cx + '" y1="' + ceilingY + '" x2="' + cx + '" y2="' + arrayY + '" stroke="#0A0A0A" stroke-width="2.5"/>';
+        }
+        mountVis += '<circle cx="' + cx + '" cy="' + ceilingY + '" r="3" fill="#0A0A0A"/>';
+      }
+    } else if (!hasSpace) {
+      mountVis +=
+        '<line x1="20" y1="' + (arrayY + drawScreenH + 2) + '" x2="380" y2="' + (arrayY + drawScreenH + 2) + '" stroke="#0A0A0A" stroke-width="2" opacity="0.4"/>';
+    }
+
+    svg.innerHTML = mountVis + spaceLayer + screens + arrayBadge + dim + hDim;
+  }
+
+  function drawCeilingElevation(svg, sw, sh, count) {
+    const viewW = 400, viewH = 240;
+    const totalW = sw * count;
+
+    const mountSurface = parseFloat(state.mountSurface) || 0;
+    const head = parseFloat(state.headClearance) || 0;
+    const ceilingEntered = state.ceilingHeight !== '' && state.ceilingHeight != null && parseFloat(state.ceilingHeight) > 0;
+    const ceilingH = ceilingEntered ? parseFloat(state.ceilingHeight) : 0;
+
+    // Clearance status drives an SVG-level warning overlay that persists until resolved
+    const clearance = getClearanceStatus();
+    const hasError = !clearance.ok;
+
+    // Available-space (optional). When entered it represents the viewable area the
+    // screens will occupy: its bottom aligns with the bottom of the screens (head
+    // clearance level) and it extends upward by spaceHeight.
+    // In ceiling mount, the effective height is capped by ceiling-1.5" / mount
+    // surface minus head clearance — see getEffectiveSpaceInfo().
+    const spaceInfo = getEffectiveSpaceInfo();
+    const hasSpace = parseFloat(state.spaceWidth) > 0 && spaceInfo.effectiveH > 0;
+    const spaceW = hasSpace ? parseFloat(state.spaceWidth) : 0;
+    const spaceH = hasSpace ? spaceInfo.effectiveH : 0;
+    const spaceCapped = spaceInfo.capped;
+
+    // Scaling references — include space so both array and space fit even when one overflows
+    const widthRef = Math.max(totalW, spaceW, 1);
+    const topRef = Math.max(ceilingH, mountSurface, head + sh, head + spaceH, 1);
+
+    // Tally vertical dimensions to allocate right-side room for tiered labels
+    let dimsCount = 0;
+    if (head > 0)        dimsCount++;
+    if (mountSurface > 0) dimsCount++;
+    if (ceilingEntered)  dimsCount++;
+
+    const padTop = 14;
+    const padBottom = 38;
+    const padLeft = 52;
+    const padRight = 14 + dimsCount * 26;
+
+    const drawAreaW = viewW - padLeft - padRight;
+    const drawAreaH = viewH - padTop - padBottom;
+
+    // Uniform scale so X and Y are to the same proportion (elevation view)
+    const scale = Math.min(drawAreaW / widthRef, drawAreaH / topRef);
+
+    const drawTotalW  = totalW * scale;
+    const drawScreenW = sw * scale;
+    const drawScreenH = sh * scale;
+    const drawSpaceW  = spaceW * scale;
+    const drawSpaceH  = spaceH * scale;
+
+    // Both array and space are centered on the same horizontal axis
+    const center = padLeft + drawAreaW / 2;
+    const arrayX = center - drawTotalW / 2;
+    const spaceX = center - drawSpaceW / 2;
+    const floorY = padTop + drawAreaH;
+
+    const ceilingY      = floorY - ceilingH      * scale;
+    const mountSurfaceY = floorY - mountSurface  * scale;
+    const screenTopY    = floorY - (head + sh)   * scale;
+    const screenBottomY = floorY - head          * scale;
+    // Available space anchored at head-clearance level, growing upward
+    const spaceBottomY  = screenBottomY;
+    const spaceTopY     = floorY - (head + spaceH) * scale;
+
+    const leftEdge = 14;
+    const rightEdge = viewW - 8;
+
+    function vDim(x, y1, y2, label, color) {
+      const yTop = Math.min(y1, y2);
+      const yBot = Math.max(y1, y2);
+      const midY = (yTop + yBot) / 2;
+      return (
+        '<line x1="' + x + '" y1="' + yTop + '" x2="' + x + '" y2="' + yBot + '" stroke="' + color + '" stroke-width="1.1"/>' +
+        '<line x1="' + (x - 4) + '" y1="' + yTop + '" x2="' + (x + 4) + '" y2="' + yTop + '" stroke="' + color + '" stroke-width="1.1"/>' +
+        '<line x1="' + (x - 4) + '" y1="' + yBot + '" x2="' + (x + 4) + '" y2="' + yBot + '" stroke="' + color + '" stroke-width="1.1"/>' +
+        '<g transform="translate(' + (x + 9) + ' ' + midY + ') rotate(-90)">' +
+          '<rect x="-20" y="-7" width="40" height="14" fill="#F5F9F8" rx="2"/>' +
+          '<text x="0" y="3" text-anchor="middle" font-size="9" fill="' + color + '" font-weight="700" font-family="-apple-system, sans-serif">' + label + '</text>' +
+        '</g>'
+      );
+    }
+
+    let scene = '';
+
+    // Floor line + hatching
+    scene += '<line x1="' + leftEdge + '" y1="' + floorY + '" x2="' + rightEdge + '" y2="' + floorY + '" stroke="#0F2622" stroke-width="1.6"/>';
+    for (let x = leftEdge; x <= rightEdge - 5; x += 14) {
+      scene += '<line x1="' + x + '" y1="' + floorY + '" x2="' + (x + 5) + '" y2="' + (floorY + 5) + '" stroke="#0F2622" stroke-width="0.7"/>';
+    }
+    scene += '<text x="' + (leftEdge + 2) + '" y="' + (floorY + 16) + '" font-size="8.5" fill="#0F2622" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.5">FLOOR</text>';
+
+    // Ceiling line + hatching (only if entered)
+    if (ceilingEntered) {
+      scene += '<line x1="' + leftEdge + '" y1="' + ceilingY + '" x2="' + rightEdge + '" y2="' + ceilingY + '" stroke="#0F2622" stroke-width="1.6"/>';
+      for (let x = leftEdge; x <= rightEdge - 5; x += 14) {
+        scene += '<line x1="' + x + '" y1="' + ceilingY + '" x2="' + (x + 5) + '" y2="' + (ceilingY - 5) + '" stroke="#0F2622" stroke-width="0.7"/>';
+      }
+      scene += '<text x="' + (leftEdge + 2) + '" y="' + (ceilingY - 4) + '" font-size="8.5" fill="#0F2622" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.5">CEILING</text>';
+    }
+
+    // Mount surface dashed line (skip if essentially same Y as ceiling)
+    if (mountSurface > 0 && (!ceilingEntered || Math.abs(ceilingH - mountSurface) > 0.5)) {
+      scene += '<line x1="' + leftEdge + '" y1="' + mountSurfaceY + '" x2="' + rightEdge + '" y2="' + mountSurfaceY + '" stroke="#2BB673" stroke-width="1.3" stroke-dasharray="4,3"/>';
+      scene += '<text x="' + (leftEdge + 2) + '" y="' + (mountSurfaceY - 4) + '" font-size="8" fill="#1F9460" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.4">MOUNTING SURFACE</text>';
+    }
+
+    // Available-space outline (dashed) with fill % badge
+    let spaceLayer = '';
+    if (hasSpace) {
+      const fillPct = Math.round(((totalW * sh) / (spaceW * spaceH)) * 100);
+      const overflows = totalW > spaceW + 0.01 || sh > spaceH + 0.01;
+      const outlineColor = overflows ? '#E63962' : '#1F9460';
+      const labelColor = outlineColor;
+      const fillBg = overflows ? '#FDECEC' : '#DCF3E5';
+      const spaceLabel = spaceCapped ? 'AVAILABLE SPACE (ADJUSTED)' : 'AVAILABLE SPACE';
+      const spaceStroke = spaceCapped ? '#E8B441' : outlineColor;
+      spaceLayer +=
+        '<rect x="' + spaceX + '" y="' + spaceTopY + '" width="' + drawSpaceW + '" height="' + drawSpaceH + '" ' +
+        'fill="rgba(43,182,115,0.05)" stroke="' + spaceStroke + '" stroke-width="1.5" stroke-dasharray="5,3" rx="3"/>' +
+        '<text x="' + (spaceX + 6) + '" y="' + (spaceTopY + 12) + '" font-size="9" fill="' + (spaceCapped ? '#6B4A0A' : labelColor) + '" ' +
+        'font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.5">' + spaceLabel + '</text>' +
+        '<rect x="' + (spaceX + drawSpaceW - 64) + '" y="' + (spaceTopY + 3) + '" width="60" height="14" fill="' + fillBg + '" rx="2"/>' +
+        '<text x="' + (spaceX + drawSpaceW - 34) + '" y="' + (spaceTopY + 13) + '" text-anchor="middle" font-size="9" ' +
+        'fill="' + labelColor + '" font-weight="700" font-family="-apple-system, sans-serif">' + (overflows ? 'OVER ' : 'FILL ') + fillPct + '%</text>';
+    }
+
+    // Poles + mount points
+    let poles = '';
+    for (let i = 0; i < count; i++) {
+      const cx = arrayX + i * drawScreenW + drawScreenW / 2;
+      if (mountSurface > 0) {
+        if (screenTopY > mountSurfaceY) {
+          poles += '<line x1="' + cx + '" y1="' + mountSurfaceY + '" x2="' + cx + '" y2="' + screenTopY + '" stroke="#0A0A0A" stroke-width="2.5"/>';
+        }
+        poles += '<circle cx="' + cx + '" cy="' + mountSurfaceY + '" r="3" fill="#0A0A0A"/>';
+      }
+    }
+
+    // Screens (border tints red when there's a clearance error)
+    const screenBorderColor = hasError ? '#E63962' : '#0A0A0A';
+    let screens = '';
+    for (let i = 0; i < count; i++) {
+      const x = arrayX + i * drawScreenW;
+      screens +=
+        '<rect x="' + (x + 1) + '" y="' + (screenTopY + 1) + '" width="' + (drawScreenW - 2) + '" height="' + (drawScreenH - 2) + '" fill="#0A0A0A" stroke="' + screenBorderColor + '" stroke-width="' + (hasError ? '2.5' : '2') + '" rx="2"/>' +
+        '<rect x="' + (x + 4) + '" y="' + (screenTopY + 4) + '" width="' + (drawScreenW - 8) + '" height="' + (drawScreenH - 8) + '" fill="#2BB673" rx="1"/>' +
+        '<text x="' + (x + drawScreenW / 2) + '" y="' + (screenTopY + drawScreenH / 2 + 4) + '" text-anchor="middle" font-size="' + Math.min(13, drawScreenW * 0.18) + '" fill="white" font-weight="700" font-family="-apple-system, sans-serif">' + state.size + '"</text>';
+    }
+
+    // Width dimension below the floor (shows SPACE width when available, else ARRAY width)
+    const dimY = floorY + 22;
+    const dimBoxX = hasSpace ? spaceX : arrayX;
+    const dimBoxW = hasSpace ? drawSpaceW : drawTotalW;
+    const dimValueW = hasSpace ? spaceW : totalW;
+    const widthDim =
+      '<line x1="' + dimBoxX + '" y1="' + dimY + '" x2="' + (dimBoxX + dimBoxW) + '" y2="' + dimY + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<line x1="' + dimBoxX + '" y1="' + (dimY - 5) + '" x2="' + dimBoxX + '" y2="' + (dimY + 5) + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<line x1="' + (dimBoxX + dimBoxW) + '" y1="' + (dimY - 5) + '" x2="' + (dimBoxX + dimBoxW) + '" y2="' + (dimY + 5) + '" stroke="#0F2622" stroke-width="1.2"/>' +
+      '<rect x="' + (dimBoxX + dimBoxW / 2 - 30) + '" y="' + (dimY + 6) + '" width="60" height="14" fill="#F5F9F8" rx="3"/>' +
+      '<text x="' + (dimBoxX + dimBoxW / 2) + '" y="' + (dimY + 16) + '" text-anchor="middle" font-size="10" fill="#0F2622" font-weight="700" font-family="-apple-system, sans-serif">' + dimValueW.toFixed(1) + '"</text>';
+
+    // Inline array-dimension badge below screens (only when space is shown, only if room)
+    let arrayBadge = '';
+    if (hasSpace) {
+      const badgeY = screenBottomY + 12;
+      if (badgeY + 8 < floorY - 4) {
+        arrayBadge =
+          '<rect x="' + (arrayX + drawTotalW / 2 - 52) + '" y="' + (badgeY - 7) + '" width="104" height="15" fill="#0A0A0A" rx="2"/>' +
+          '<text x="' + (arrayX + drawTotalW / 2) + '" y="' + (badgeY + 4) + '" text-anchor="middle" font-size="9.5" fill="white" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.3">ARRAY ' + totalW.toFixed(1) + '" × ' + sh.toFixed(1) + '"</text>';
+      }
+    }
+
+    // Tiered vertical dimensions on the right: head clearance, mount surface, ceiling
+    let curX = Math.max(arrayX + drawTotalW, hasSpace ? spaceX + drawSpaceW : 0) + 14;
+    let vDims = '';
+    if (head > 0) {
+      vDims += vDim(curX, floorY, screenBottomY, head.toFixed(1) + '"', '#0F2622');
+      curX += 26;
+    }
+    if (mountSurface > 0) {
+      vDims += vDim(curX, floorY, mountSurfaceY, mountSurface.toFixed(1) + '"', '#1F9460');
+      curX += 26;
+    }
+    if (ceilingEntered) {
+      vDims += vDim(curX, floorY, ceilingY, ceilingH.toFixed(1) + '"', '#5A6B68');
+      curX += 26;
+    }
+
+    // Warning overlay — only when clearance fails. Stays visible until resolved.
+    let warnOverlay = '';
+    if (hasError) {
+      // Max allowed top-of-screen line (only if effectiveLimit is finite and within view)
+      if (isFinite(clearance.effectiveLimit)) {
+        const maxTopY = floorY - clearance.effectiveLimit * scale;
+        if (maxTopY > padTop - 6 && maxTopY < floorY) {
+          warnOverlay +=
+            '<line x1="' + leftEdge + '" y1="' + maxTopY + '" x2="' + rightEdge + '" y2="' + maxTopY + '" stroke="#E63962" stroke-width="1.4" stroke-dasharray="6,3"/>' +
+            '<rect x="' + (rightEdge - 92) + '" y="' + (maxTopY - 8) + '" width="88" height="14" fill="#E63962" rx="2"/>' +
+            '<text x="' + (rightEdge - 48) + '" y="' + (maxTopY + 2) + '" text-anchor="middle" font-size="8.5" fill="white" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.4">MAX SCREEN TOP</text>';
+        }
+      }
+      // Banner across the top of the diagram with the specific error
+      let bannerText = 'CLEARANCE ERROR';
+      if (clearance.errorType === 'pole')     bannerText = '⚠ CLEARANCE ERROR — POLE LENGTH NEGATIVE';
+      else if (clearance.errorType === 'missing') bannerText = '⚠ ENTER MOUNTING SURFACE OR CEILING HEIGHT';
+      else if (clearance.errorType === 'overhead') bannerText = '⚠ TOP OF SCREEN EXCEEDS CLEARANCE LIMIT';
+      const bannerW = 280;
+      const bannerX = (viewW - bannerW) / 2;
+      const bannerY = 2;
+      warnOverlay +=
+        '<rect x="' + bannerX + '" y="' + bannerY + '" width="' + bannerW + '" height="14" fill="#E63962" rx="3"/>' +
+        '<text x="' + (viewW / 2) + '" y="' + (bannerY + 10) + '" text-anchor="middle" font-size="9" fill="white" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.5">' + bannerText + '</text>';
+    }
+
+    svg.innerHTML = scene + spaceLayer + poles + screens + arrayBadge + widthDim + vDims + warnOverlay;
+  }
+
+  function updateRecommendations() {
+    const card = document.getElementById('recCard');
+    const list = document.getElementById('recList');
+    const w = parseFloat(state.spaceWidth);
+    const recInfo = getEffectiveSpaceInfo();
+    const h = recInfo.effectiveH;
+
+    if (!w || !h || w <= 0 || h <= 0) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = 'block';
+
+    // Generate viable combinations
+    const recs = [];
+    Object.keys(DISPLAYS).forEach(sizeStr => {
+      const size = parseInt(sizeStr, 10);
+      const d = DISPLAYS[size];
+      ['landscape', 'portrait'].forEach(orient => {
+        const sw = orient === 'landscape' ? d.w : d.h;
+        const sh = orient === 'landscape' ? d.h : d.w;
+        if (sh > h) return; // even one screen too tall
+        for (let n = 1; n <= 8; n++) {
+          const totalW = sw * n;
+          if (totalW > w) break;
+          recs.push({
+            size, orient, count: n,
+            totalW, totalH: sh,
+            coverage: (totalW * sh) / (w * h),
+            widthFill: totalW / w,
+            heightFill: sh / h
+          });
+        }
+      });
+    });
+
+    // Sort by coverage desc; tiebreaker prefers larger screens then fewer of them
+    recs.sort((a, b) => {
+      if (Math.abs(b.coverage - a.coverage) > 0.001) return b.coverage - a.coverage;
+      if (a.size !== b.size) return b.size - a.size;
+      return a.count - b.count;
+    });
+
+    // Deduplicate: keep best count per size+orientation
+    const seen = new Set();
+    const unique = [];
+    for (const r of recs) {
+      const k = r.size + '_' + r.orient;
+      if (seen.has(k)) continue;
+      seen.add(k);
+      unique.push(r);
+    }
+
+    const top = unique.slice(0, 5);
+
+    if (top.length === 0) {
+      list.innerHTML = '<div class="rec-empty">No screen combination fits in this space. Try increasing the available dimensions or choosing a smaller screen size.</div>';
+      return;
+    }
+
+    list.innerHTML = top.map((r, i) => {
+      const orientLabel = r.orient === 'landscape' ? 'Landscape' : 'Portrait';
+      const widthPct = Math.round(r.widthFill * 100);
+      const heightPct = Math.round(r.heightFill * 100);
+      return (
+        '<button type="button" class="rec' + (i === 0 ? ' best' : '') + '" ' +
+        'onclick="applyRec(' + r.size + ',\'' + r.orient + '\',' + r.count + ')">' +
+          '<div class="rec-info">' +
+            '<div class="title">' + r.count + ' × ' + r.size + '" ' + orientLabel + '</div>' +
+            '<div class="meta">' +
+              r.totalW.toFixed(1) + '" × ' + r.totalH.toFixed(1) + '" ' +
+              '(' + (r.totalW / 12).toFixed(2) + ' × ' + (r.totalH / 12).toFixed(2) + ' ft)<br>' +
+              widthPct + '% of width · ' + heightPct + '% of height' +
+            '</div>' +
+          '</div>' +
+          '<div class="rec-fill">' +
+            '<div class="pct">' + Math.round(r.coverage * 100) + '%</div>' +
+            '<div class="pct-label">filled</div>' +
+          '</div>' +
+        '</button>'
+      );
+    }).join('');
+  }
+
+  function applyRec(size, orient, count) {
+    state.size = size;
+    state.orientation = orient;
+    state.count = count;
+    document.getElementById('screenSize').value = size;
+    document.getElementById('screenCount').value = count;
+    document.querySelectorAll('#orientation button').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === orient);
+    });
+    compute();
+    document.getElementById('diagram').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Combined summary — Copy Summary and Print on either page produce a single
+  // document covering the calculator configuration AND the screen-selector
+  // display pick. Each page saves its own summary to localStorage on every
+  // state change; the sibling page reads it back when the user copies/prints.
+  // ---------------------------------------------------------------------------
+  const CALC_SUMMARY_KEY = 'vistify.calcSummary';
+  const SELECTOR_SUMMARY_KEY = 'vistify.selectorSummary';
+
+  // Small HTML escape so user-typed values can't break the print markup.
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function kvRow(label, value) {
+    return '<tr><td>' + esc(label) + '</td><td>' + value + '</td></tr>';
+  }
+
+  // Build the prefix-INDEPENDENT half of the calculator summary. Cached to
+  // localStorage so the Screen Selector can include it in Copy/Print without
+  // rebuilding the math itself. The SKU prefix is intentionally NOT baked in
+  // here — it's prepended at render time using the live `vistify.skuPrefix`
+  // value, which fixes the stale-prefix bug when the user changes their
+  // display selection on the other page after the calculator was last open.
+  function buildCalcSummaryRaw() {
+    const d = DISPLAYS[state.size];
+    const perScreenW = state.orientation === 'landscape' ? d.w : d.h;
+    const perScreenH = state.orientation === 'landscape' ? d.h : d.w;
+    const overallW = perScreenW * state.count;
+    const skuBody = computeSku();
+
+    // Plain-text body lines (everything EXCEPT the prefix-dependent header)
+    const bodyLines = [
+      'Screen size:       ' + state.size + '"',
+      'Orientation:       ' + (state.orientation === 'landscape' ? 'Landscape' : 'Portrait'),
+      'Number of screens: ' + state.count,
+      'Per-screen:        ' + perScreenW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H',
+      'Overall array:     ' + overallW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H',
+      '                   (' + (overallW / 12).toFixed(2) + ' ft × ' + (perScreenH / 12).toFixed(2) + ' ft)',
+      'Mount type:        ' + (state.mountType === 'wall' ? 'Wall mount' : 'Ceiling mount (suspended pole)')
+    ];
+
+    let poleSuffix = '';
+    let mountSurfaceNum = null, headNum = null, poleLength = null, ceilingNum = null;
+    if (state.mountType === 'ceiling') {
+      if (state.mountSurfaceType) bodyLines.push('Mounting surface:  ' + state.mountSurfaceType);
+      poleSuffix = getPoleSuffix();
+      if (poleSuffix) bodyLines.push('Pole assembly:     ' + poleSuffix.replace(/^\(|\)$/g, ''));
+      mountSurfaceNum = parseFloat(state.mountSurface) || 0;
+      headNum = parseFloat(state.headClearance) || 0;
+      poleLength = mountSurfaceNum - (headNum + perScreenH / 2 + HARDWARE_INCHES);
+      bodyLines.push('Mount surface ht:  ' + mountSurfaceNum.toFixed(1) + '"');
+      if (state.ceilingHeight !== '' && state.ceilingHeight != null) {
+        ceilingNum = parseFloat(state.ceilingHeight);
+        bodyLines.push('Ceiling height:    ' + ceilingNum.toFixed(1) + '"');
+      }
+      bodyLines.push('Head clearance:    ' + headNum.toFixed(1) + '"');
+      bodyLines.push('Min pole length:   ' + poleLength.toFixed(1) + '"');
+    }
+
+    // HTML body rows (same content, no prefix references)
+    let bodyRows = '';
+    bodyRows += kvRow('Screen size', esc(state.size) + '"');
+    bodyRows += kvRow('Orientation', state.orientation === 'landscape' ? 'Landscape' : 'Portrait');
+    bodyRows += kvRow('Number of screens', esc(state.count));
+    bodyRows += kvRow('Per-screen dimensions', perScreenW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H');
+    bodyRows += kvRow('Overall array', overallW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H ' +
+                  '(' + (overallW / 12).toFixed(2) + ' ft × ' + (perScreenH / 12).toFixed(2) + ' ft)');
+    bodyRows += kvRow('Mount type', state.mountType === 'wall' ? 'Wall mount' : 'Ceiling mount (suspended pole)');
+    if (state.mountType === 'ceiling') {
+      if (state.mountSurfaceType) bodyRows += kvRow('Ceiling mounting surface', esc(state.mountSurfaceType));
+      if (poleSuffix) bodyRows += kvRow('Pole assembly', '<span class="sku">' + esc(poleSuffix.replace(/^\(|\)$/g, '')) + '</span>');
+      bodyRows += kvRow('Mount surface ht', mountSurfaceNum.toFixed(1) + '"');
+      if (ceilingNum != null) bodyRows += kvRow('Ceiling height', ceilingNum.toFixed(1) + '"');
+      bodyRows += kvRow('Head clearance', headNum.toFixed(1) + '"');
+      bodyRows += kvRow('Min pole length', poleLength.toFixed(1) + '"');
+    }
+
+    return { skuBody: skuBody, bodyText: bodyLines.join('\n'), bodyRows: bodyRows };
+  }
+
+  // Take a raw calc summary (prefix-free) and render the final text + HTML
+  // using the CURRENT SKU prefix from storage. This is the only place the
+  // prefix is concatenated, so it always reflects the user's latest pick.
+  function renderCalcSummary(raw, prefix, prefixName) {
+    if (!raw) return null;
+    const fullSku = (prefix || '') + raw.skuBody;
+    const headerLines = [
+      'Vistify Digital Menu Board — Configuration Summary',
+      '----------------------------------------------------',
+      'Configuration SKU: ' + fullSku
+    ];
+    if (prefix) headerLines.push('Display selection: ' + (prefixName || 'See Screen Selector') + ' (prefix ' + prefix + ')');
+
+    let headerRows = '';
+    headerRows += kvRow('Configuration SKU', '<span class="sku">' + esc(fullSku) + '</span>');
+    if (prefix) headerRows += kvRow('Display selection', esc(prefixName || 'See Screen Selector') + ' <span class="sku">(' + esc(prefix) + ')</span>');
+
+    const text = headerLines.join('\n') + '\n' + raw.bodyText;
+    const html =
+      '<section class="print-block">' +
+        '<h2>Configuration (Measurement Calculator)</h2>' +
+        '<table class="print-kv"><tbody>' + headerRows + raw.bodyRows + '</tbody></table>' +
+      '</section>';
+    return { text: text, html: html };
+  }
+
+  // Render the calc summary using current state + current live prefix.
+  function buildCalcSummary() {
+    return renderCalcSummary(buildCalcSummaryRaw(), getSkuPrefix(), getSkuPrefixName());
+  }
+
+  // Persist the prefix-INDEPENDENT calc summary so the screen-selector page
+  // can pull it in and apply its own current prefix at render time.
+  function saveCalcSummaryToStorage() {
+    try {
+      localStorage.setItem(CALC_SUMMARY_KEY, JSON.stringify(buildCalcSummaryRaw()));
+    } catch (e) { /* non-fatal */ }
+  }
+  function loadSelectorSummary() {
+    try {
+      const raw = localStorage.getItem(SELECTOR_SUMMARY_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function copySummary() {
+    const my = buildCalcSummary();
+    const sib = loadSelectorSummary();
+    let text = my.text;
+    if (sib && sib.text) {
+      text += '\n\n' + sib.text;
+    } else {
+      text += '\n\n(No display selection saved yet — visit the Screen Selector to add one.)';
+    }
+    navigator.clipboard.writeText(text).then(function () {
+      const btn = document.getElementById('copyBtn');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(function () { btn.textContent = orig; }, 1600);
+    });
+  }
+
+  function printSummary() {
+    const my = buildCalcSummary();
+    const sib = loadSelectorSummary();
+    const dateStr = new Date().toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+    const area = document.getElementById('print-area');
+    if (!area) { window.print(); return; }
+    let body = '<div class="print-doc">' +
+      '<div class="print-header">' +
+        '<img src="assets/brand/vistify-wordmark.png" alt="Vistify">' +
+        '<div class="print-title">Digital Menu Board — Sales Summary</div>' +
+        '<div class="print-date">' + esc(dateStr) + '</div>' +
+      '</div>' +
+      my.html;
+    if (sib && sib.html) {
+      body += sib.html;
+    } else {
+      body += '<section class="print-block"><h2>Display Selection (Screen Selector)</h2>' +
+              '<div class="print-missing">No display selection saved yet — open the Screen Selector page to choose a display.</div>' +
+              '</section>';
+    }
+    body += '<div class="print-footer">Generated by the Vistify Digital Menu Board Sales Tool.</div>' +
+            '</div>';
+    area.innerHTML = body;
+    window.print();
+  }
+
+  // Restore prior calculator configuration (if any) BEFORE the initial compute
+  // so the UI loads with the user's last inputs already in place.
+  applyCalcStateToForm(loadCalcState());
+  compute();
+</script>
+
+<!-- Print-only summary; populated by printSummary() and hidden on screen. -->
+<div id="print-area" aria-hidden="true"></div>
+
+</body>
+</html>
