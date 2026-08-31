@@ -746,6 +746,38 @@
   .surface-card.selected { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
   .surface-card.selected span { color: var(--teal-dark); }
 
+  /* Drop-ceiling example illustration next to the ceiling-height input */
+  .ceiling-sample {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+  .ceiling-sample img {
+    width: 110px;
+    height: 74px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: block;
+  }
+  .ceiling-sample-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .ceiling-sample-text strong {
+    display: block;
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
   /* ------------------------------------------------------------------
      Print summary — clean printable view that combines the calculator
      summary with the screen-selector summary (read from localStorage).
@@ -960,7 +992,13 @@
             <input type="number" id="ceilingHeight" value="" min="0" step="0.5" placeholder="Same as mounting surface">
             <button type="button" onclick="stepInput('ceilingHeight', 1)">+</button>
           </div>
-          <div class="hint">Only fill in if a drop ceiling sits below the structural mounting surface</div>
+          <div class="ceiling-sample">
+            <img src="assets/mount-surfaces/drop-ceiling.jpg" alt="Drop ceiling example" loading="lazy">
+            <div class="ceiling-sample-text">
+              <strong>Example: drop ceiling</strong>
+              <span>Only fill in if a drop ceiling sits below the structural mounting surface</span>
+            </div>
+          </div>
         </div>
 
         <div class="field">
@@ -982,10 +1020,6 @@
             <button type="button" class="surface-card" data-value="Direct to Wood Beam">
               <img src="assets/mount-surfaces/direct-to-wood-beam.jpg" alt="Direct to Wood Beam" loading="lazy">
               <span>Direct to Wood Beam</span>
-            </button>
-            <button type="button" class="surface-card" data-value="Drop Ceiling">
-              <img src="assets/mount-surfaces/drop-ceiling.jpg" alt="Drop Ceiling" loading="lazy">
-              <span>Drop Ceiling</span>
             </button>
             <button type="button" class="surface-card" data-value="Flush Mount Backed Surface">
               <img src="assets/mount-surfaces/flush-mount-backed-surface.jpg" alt="Flush Mount Backed Surface" loading="lazy">
