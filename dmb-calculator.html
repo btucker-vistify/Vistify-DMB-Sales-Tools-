@@ -794,6 +794,42 @@
     vertical-align: 1px;
   }
   .field-num.optional { background: var(--brand-red); }
+  /* Ceiling mounting surface selector */
+  .surface-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .surface-card {
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    padding: 0 0 8px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: center;
+    overflow: hidden;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  }
+  .surface-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    background: var(--bg);
+    display: block;
+    margin-bottom: 7px;
+  }
+  .surface-card span {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    display: block;
+    padding: 0 6px;
+  }
+  .surface-card:hover { border-color: var(--teal); transform: translateY(-1px); }
+  .surface-card.selected { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+  .surface-card.selected span { color: var(--teal-dark); }
 
   /* ------------------------------------------------------------------
      Print summary — clean printable view that combines the calculator
@@ -1021,6 +1057,44 @@
           </div>
           <div class="hint">80" minimum is the standard OSHA head clearance</div>
         </div>
+        <div class="field">
+          <label>Ceiling mounting surface</label>
+          <div class="surface-grid" id="surfaceGrid">
+            <button type="button" class="surface-card" data-value="Direct to I-Beam">
+              <img src="assets/mount-surfaces/direct-to-i-beam.jpg" alt="Direct to I-Beam" loading="lazy">
+              <span>Direct to I-Beam</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Direct to Wood Beam">
+              <img src="assets/mount-surfaces/direct-to-wood-beam.jpg" alt="Direct to Wood Beam" loading="lazy">
+              <span>Direct to Wood Beam</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Drop Ceiling">
+              <img src="assets/mount-surfaces/drop-ceiling.jpg" alt="Drop Ceiling" loading="lazy">
+              <span>Drop Ceiling</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Flush Mount Backed Surface">
+              <img src="assets/mount-surfaces/flush-mount-backed-surface.jpg" alt="Flush Mount Backed Surface" loading="lazy">
+              <span>Flush Mount Backed Surface</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Framed Sub-Ceiling 14-gauge Strut">
+              <img src="assets/mount-surfaces/framed-sub-ceiling-14-gauge-strut.jpg" alt="Framed Sub-Ceiling 14-gauge Strut" loading="lazy">
+              <span>Framed Sub-Ceiling 14-gauge Strut</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Spanning I-Beams 14-gauge Strut">
+              <img src="assets/mount-surfaces/spanning-i-beams-14-gauge-strut.jpg" alt="Spanning I-Beams 14-gauge Strut" loading="lazy">
+              <span>Spanning I-Beams 14-gauge Strut</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Spanning Single 12-gauge Strut">
+              <img src="assets/mount-surfaces/spanning-single-12-gauge-strut.jpg" alt="Spanning Single 12-gauge Strut" loading="lazy">
+              <span>Spanning Single 12-gauge Strut</span>
+            </button>
+            <button type="button" class="surface-card" data-value="Spanning Wood Beams 14-gauge Strut">
+              <img src="assets/mount-surfaces/spanning-wood-beams-14-gauge-strut.jpg" alt="Spanning Wood Beams 14-gauge Strut" loading="lazy">
+              <span>Spanning Wood Beams 14-gauge Strut</span>
+            </button>
+          </div>
+          <div class="hint">How the pole attaches to the building structure — click again to deselect</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1135,6 +1209,7 @@
     orientation: 'landscape',
     count: 3,
     mountType: 'wall',
+    mountSurfaceType: '',
     mountSurface: 120,
     ceilingHeight: '',
     headClearance: 80,
@@ -1172,6 +1247,21 @@
   ['mountSurface', 'ceilingHeight', 'headClearance', 'spaceWidth', 'spaceHeight'].forEach(id => {
     document.getElementById(id).addEventListener('input', e => {
       state[id] = e.target.value === '' ? '' : parseFloat(e.target.value);
+      compute();
+    });
+  });
+
+  // Ceiling mounting surface selector — click to select, click again to deselect.
+  function renderSurfaceSelection() {
+    document.querySelectorAll('#surfaceGrid .surface-card').forEach(function (c) {
+      c.classList.toggle('selected', c.dataset.value === state.mountSurfaceType);
+    });
+  }
+  document.querySelectorAll('#surfaceGrid .surface-card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      const val = card.dataset.value;
+      state.mountSurfaceType = (state.mountSurfaceType === val) ? '' : val;
+      renderSurfaceSelection();
       compute();
     });
   });
@@ -1492,7 +1582,7 @@
   function applyCalcStateToForm(s) {
     if (!s || typeof s !== 'object') return;
     // Whitelist of fields we know about — guards against unrelated keys.
-    ['size','orientation','count','mountType','mountSurface','ceilingHeight','headClearance','spaceWidth','spaceHeight'].forEach(k => {
+    ['size','orientation','count','mountType','mountSurfaceType','mountSurface','ceilingHeight','headClearance','spaceWidth','spaceHeight'].forEach(k => {
       if (s[k] !== undefined) state[k] = s[k];
     });
     // <select> and <input> values
@@ -1991,402 +2081,4 @@
       // Max allowed top-of-screen line (only if effectiveLimit is finite and within view)
       if (isFinite(clearance.effectiveLimit)) {
         const maxTopY = floorY - clearance.effectiveLimit * scale;
-        if (maxTopY > padTop - 6 && maxTopY < floorY) {
-          warnOverlay +=
-            '<line x1="' + leftEdge + '" y1="' + maxTopY + '" x2="' + rightEdge + '" y2="' + maxTopY + '" stroke="#E63962" stroke-width="1.4" stroke-dasharray="6,3"/>' +
-            '<rect x="' + (rightEdge - 92) + '" y="' + (maxTopY - 8) + '" width="88" height="14" fill="#E63962" rx="2"/>' +
-            '<text x="' + (rightEdge - 48) + '" y="' + (maxTopY + 2) + '" text-anchor="middle" font-size="8.5" fill="white" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.4">MAX SCREEN TOP</text>';
-        }
-      }
-      // Banner across the top of the diagram with the specific error
-      let bannerText = 'CLEARANCE ERROR';
-      if (clearance.errorType === 'pole')     bannerText = '⚠ CLEARANCE ERROR — POLE LENGTH NEGATIVE';
-      else if (clearance.errorType === 'missing') bannerText = '⚠ ENTER MOUNTING SURFACE OR CEILING HEIGHT';
-      else if (clearance.errorType === 'overhead') bannerText = '⚠ TOP OF SCREEN EXCEEDS CLEARANCE LIMIT';
-      const bannerW = 280;
-      const bannerX = (viewW - bannerW) / 2;
-      const bannerY = 2;
-      warnOverlay +=
-        '<rect x="' + bannerX + '" y="' + bannerY + '" width="' + bannerW + '" height="14" fill="#E63962" rx="3"/>' +
-        '<text x="' + (viewW / 2) + '" y="' + (bannerY + 10) + '" text-anchor="middle" font-size="9" fill="white" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="0.5">' + bannerText + '</text>';
-    }
-
-    svg.innerHTML = scene + spaceLayer + poles + screens + arrayBadge + widthDim + vDims + warnOverlay;
-  }
-
-  function updateRecommendations() {
-    const card = document.getElementById('recCard');
-    const list = document.getElementById('recList');
-    const w = parseFloat(state.spaceWidth);
-    const recInfo = getEffectiveSpaceInfo();
-    const h = recInfo.effectiveH;
-
-    if (!w || !h || w <= 0 || h <= 0) {
-      card.style.display = 'none';
-      return;
-    }
-    card.style.display = 'block';
-
-    // Generate viable combinations
-    const recs = [];
-    Object.keys(DISPLAYS).forEach(sizeStr => {
-      const size = parseInt(sizeStr, 10);
-      const d = DISPLAYS[size];
-      ['landscape', 'portrait'].forEach(orient => {
-        const sw = orient === 'landscape' ? d.w : d.h;
-        const sh = orient === 'landscape' ? d.h : d.w;
-        if (sh > h) return; // even one screen too tall
-        for (let n = 1; n <= 8; n++) {
-          const totalW = sw * n;
-          if (totalW > w) break;
-          recs.push({
-            size, orient, count: n,
-            totalW, totalH: sh,
-            coverage: (totalW * sh) / (w * h),
-            widthFill: totalW / w,
-            heightFill: sh / h
-          });
-        }
-      });
-    });
-
-    // Sort by coverage desc; tiebreaker prefers larger screens then fewer of them
-    recs.sort((a, b) => {
-      if (Math.abs(b.coverage - a.coverage) > 0.001) return b.coverage - a.coverage;
-      if (a.size !== b.size) return b.size - a.size;
-      return a.count - b.count;
-    });
-
-    // Deduplicate: keep best count per size+orientation
-    const seen = new Set();
-    const unique = [];
-    for (const r of recs) {
-      const k = r.size + '_' + r.orient;
-      if (seen.has(k)) continue;
-      seen.add(k);
-      unique.push(r);
-    }
-
-    const top = unique.slice(0, 5);
-
-    if (top.length === 0) {
-      list.innerHTML = '<div class="rec-empty">No screen combination fits in this space. Try increasing the available dimensions or choosing a smaller screen size.</div>';
-      return;
-    }
-
-    list.innerHTML = top.map((r, i) => {
-      const orientLabel = r.orient === 'landscape' ? 'Landscape' : 'Portrait';
-      const widthPct = Math.round(r.widthFill * 100);
-      const heightPct = Math.round(r.heightFill * 100);
-      return (
-        '<button type="button" class="rec' + (i === 0 ? ' best' : '') + '" ' +
-        'onclick="applyRec(' + r.size + ',\'' + r.orient + '\',' + r.count + ')">' +
-          '<div class="rec-info">' +
-            '<div class="title">' + r.count + ' × ' + r.size + '" ' + orientLabel + '</div>' +
-            '<div class="meta">' +
-              r.totalW.toFixed(1) + '" × ' + r.totalH.toFixed(1) + '" ' +
-              '(' + (r.totalW / 12).toFixed(2) + ' × ' + (r.totalH / 12).toFixed(2) + ' ft)<br>' +
-              widthPct + '% of width · ' + heightPct + '% of height' +
-            '</div>' +
-          '</div>' +
-          '<div class="rec-fill">' +
-            '<div class="pct">' + Math.round(r.coverage * 100) + '%</div>' +
-            '<div class="pct-label">filled</div>' +
-          '</div>' +
-        '</button>'
-      );
-    }).join('');
-  }
-
-  function applyRec(size, orient, count) {
-    state.size = size;
-    state.orientation = orient;
-    state.count = count;
-    document.getElementById('screenSize').value = size;
-    document.getElementById('screenCount').value = count;
-    document.querySelectorAll('#orientation button').forEach(b => {
-      b.classList.toggle('active', b.dataset.value === orient);
-    });
-    compute();
-    document.getElementById('diagram').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  // ---------------------------------------------------------------------------
-  // Combined summary — Copy Summary and Print on either page produce a single
-  // document covering the calculator configuration AND the screen-selector
-  // display pick. Each page saves its own summary to localStorage on every
-  // state change; the sibling page reads it back when the user copies/prints.
-  // ---------------------------------------------------------------------------
-  const CALC_SUMMARY_KEY = 'vistify.calcSummary';
-  const SELECTOR_SUMMARY_KEY = 'vistify.selectorSummary';
-
-  // Small HTML escape so user-typed values can't break the print markup.
-  function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  }
-  function kvRow(label, value) {
-    return '<tr><td>' + esc(label) + '</td><td>' + value + '</td></tr>';
-  }
-
-  // Build the prefix-INDEPENDENT half of the calculator summary. Cached to
-  // localStorage so the Screen Selector can include it in Copy/Print without
-  // rebuilding the math itself. The SKU prefix is intentionally NOT baked in
-  // here — it's prepended at render time using the live `vistify.skuPrefix`
-  // value, which fixes the stale-prefix bug when the user changes their
-  // display selection on the other page after the calculator was last open.
-  function buildCalcSummaryRaw() {
-    const d = DISPLAYS[state.size];
-    const perScreenW = state.orientation === 'landscape' ? d.w : d.h;
-    const perScreenH = state.orientation === 'landscape' ? d.h : d.w;
-    const overallW = perScreenW * state.count;
-    const skuBody = computeSku();
-
-    // Plain-text body lines (everything EXCEPT the prefix-dependent header)
-    const bodyLines = [
-      'Screen size:       ' + state.size + '"',
-      'Orientation:       ' + (state.orientation === 'landscape' ? 'Landscape' : 'Portrait'),
-      'Number of screens: ' + state.count,
-      'Per-screen:        ' + perScreenW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H',
-      'Overall array:     ' + overallW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H',
-      '                   (' + (overallW / 12).toFixed(2) + ' ft × ' + (perScreenH / 12).toFixed(2) + ' ft)',
-      'Mount type:        ' + (state.mountType === 'wall' ? 'Wall mount' : 'Ceiling mount (suspended pole)')
-    ];
-
-    let poleSuffix = '';
-    let mountSurfaceNum = null, headNum = null, poleLength = null, ceilingNum = null;
-    if (state.mountType === 'ceiling') {
-      poleSuffix = getPoleSuffix();
-      if (poleSuffix) bodyLines.push('Pole assembly:     ' + poleSuffix.replace(/^\(|\)$/g, ''));
-      mountSurfaceNum = parseFloat(state.mountSurface) || 0;
-      headNum = parseFloat(state.headClearance) || 0;
-      poleLength = mountSurfaceNum - (headNum + perScreenH / 2 + HARDWARE_INCHES);
-      bodyLines.push('Mount surface ht:  ' + mountSurfaceNum.toFixed(1) + '"');
-      if (state.ceilingHeight !== '' && state.ceilingHeight != null) {
-        ceilingNum = parseFloat(state.ceilingHeight);
-        bodyLines.push('Ceiling height:    ' + ceilingNum.toFixed(1) + '"');
-      }
-      bodyLines.push('Head clearance:    ' + headNum.toFixed(1) + '"');
-      bodyLines.push('Min pole length:   ' + poleLength.toFixed(1) + '"');
-    }
-
-    // HTML body rows (same content, no prefix references)
-    let bodyRows = '';
-    bodyRows += kvRow('Screen size', esc(state.size) + '"');
-    bodyRows += kvRow('Orientation', state.orientation === 'landscape' ? 'Landscape' : 'Portrait');
-    bodyRows += kvRow('Number of screens', esc(state.count));
-    bodyRows += kvRow('Per-screen dimensions', perScreenW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H');
-    bodyRows += kvRow('Overall array', overallW.toFixed(1) + '" W × ' + perScreenH.toFixed(1) + '" H ' +
-                  '(' + (overallW / 12).toFixed(2) + ' ft × ' + (perScreenH / 12).toFixed(2) + ' ft)');
-    bodyRows += kvRow('Mount type', state.mountType === 'wall' ? 'Wall mount' : 'Ceiling mount (suspended pole)');
-    if (state.mountType === 'ceiling') {
-      if (poleSuffix) bodyRows += kvRow('Pole assembly', '<span class="sku">' + esc(poleSuffix.replace(/^\(|\)$/g, '')) + '</span>');
-      bodyRows += kvRow('Mount surface ht', mountSurfaceNum.toFixed(1) + '"');
-      if (ceilingNum != null) bodyRows += kvRow('Ceiling height', ceilingNum.toFixed(1) + '"');
-      bodyRows += kvRow('Head clearance', headNum.toFixed(1) + '"');
-      bodyRows += kvRow('Min pole length', poleLength.toFixed(1) + '"');
-    }
-
-    return { skuBody: skuBody, bodyText: bodyLines.join('\n'), bodyRows: bodyRows };
-  }
-
-  // Take a raw calc summary (prefix-free) and render the final text + HTML
-  // using the CURRENT SKU prefix from storage. This is the only place the
-  // prefix is concatenated, so it always reflects the user's latest pick.
-  function renderCalcSummary(raw, prefix, prefixName) {
-    if (!raw) return null;
-    const fullSku = (prefix || '') + raw.skuBody;
-    const headerLines = [
-      'Vistify Digital Menu Board — Configuration Summary',
-      '----------------------------------------------------',
-      'Configuration SKU: ' + fullSku
-    ];
-    if (prefix) headerLines.push('Display selection: ' + (prefixName || 'See Screen Selector') + ' (prefix ' + prefix + ')');
-
-    let headerRows = '';
-    headerRows += kvRow('Configuration SKU', '<span class="sku">' + esc(fullSku) + '</span>');
-    if (prefix) headerRows += kvRow('Display selection', esc(prefixName || 'See Screen Selector') + ' <span class="sku">(' + esc(prefix) + ')</span>');
-
-    const text = headerLines.join('\n') + '\n' + raw.bodyText;
-    const html =
-      '<section class="print-block">' +
-        '<h2>Configuration (Measurement Calculator)</h2>' +
-        '<table class="print-kv"><tbody>' + headerRows + raw.bodyRows + '</tbody></table>' +
-      '</section>';
-    return { text: text, html: html };
-  }
-
-  // Render the calc summary using current state + current live prefix.
-  function buildCalcSummary() {
-    return renderCalcSummary(buildCalcSummaryRaw(), getSkuPrefix(), getSkuPrefixName());
-  }
-
-  // Persist the prefix-INDEPENDENT calc summary so the screen-selector page
-  // can pull it in and apply its own current prefix at render time.
-  function saveCalcSummaryToStorage() {
-    try {
-      localStorage.setItem(CALC_SUMMARY_KEY, JSON.stringify(buildCalcSummaryRaw()));
-    } catch (e) { /* non-fatal */ }
-  }
-  function loadSelectorSummary() {
-    try {
-      const raw = localStorage.getItem(SELECTOR_SUMMARY_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) { return null; }
-  }
-
-  // Quote request — opens a modal form that creates a Lead in Salesforce via
-  // Web-to-Lead (same org/fields as the vistifyinc.com contact form). The full
-  // configuration summary is attached to the Lead's Description field, and the
-  // POST targets a hidden iframe so the user stays on the calculator.
-  function requestQuote() {
-    const my = buildCalcSummary();
-    const sib = loadSelectorSummary();
-    let desc = 'Quote request from DMB Calculator\n\n' + my.text;
-    if (sib && sib.text) desc += '\n\n' + sib.text;
-    const descEl = document.getElementById('quoteDescription');
-    if (descEl) descEl.value = desc;
-    // Compact preview: the full combined SKU (details ride along in Description)
-    const suffix = getPoleSuffix();
-    const previewEl = document.getElementById('quoteConfigPreview');
-    if (previewEl) previewEl.textContent = getSkuPrefix() + computeSku() + (suffix ? ' ' + suffix : '');
-    const wrap = document.getElementById('quoteFormWrap');
-    const thanks = document.getElementById('quoteThanks');
-    if (wrap) wrap.classList.remove('hide');
-    if (thanks) thanks.classList.add('hide');
-    const modal = document.getElementById('quoteModal');
-    if (modal) modal.classList.remove('hide');
-    const first = document.getElementById('qf_first');
-    if (first) first.focus();
-  }
-  function closeQuoteModal() {
-    const modal = document.getElementById('quoteModal');
-    if (modal) modal.classList.add('hide');
-  }
-  // Modal wiring: show the thank-you state on submit (the POST completes in the
-  // hidden iframe), and let Escape close the modal.
-  document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('quoteForm');
-    if (form) form.addEventListener('submit', function () {
-      setTimeout(function () {
-        const wrap = document.getElementById('quoteFormWrap');
-        const thanks = document.getElementById('quoteThanks');
-        if (wrap) wrap.classList.add('hide');
-        if (thanks) thanks.classList.remove('hide');
-      }, 250);
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeQuoteModal();
-    });
-  });
-
-  function copySummary() {
-    const my = buildCalcSummary();
-    const sib = loadSelectorSummary();
-    let text = my.text;
-    if (sib && sib.text) {
-      text += '\n\n' + sib.text;
-    } else {
-      text += '\n\n(No display selection saved yet — visit the Screen Selector to add one.)';
-    }
-    navigator.clipboard.writeText(text).then(function () {
-      const btn = document.getElementById('copyBtn');
-      const orig = btn.textContent;
-      btn.textContent = 'Copied ✓';
-      setTimeout(function () { btn.textContent = orig; }, 1600);
-    });
-  }
-
-  function printSummary() {
-    const my = buildCalcSummary();
-    const sib = loadSelectorSummary();
-    const dateStr = new Date().toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
-    const area = document.getElementById('print-area');
-    if (!area) { window.print(); return; }
-    let body = '<div class="print-doc">' +
-      '<div class="print-header">' +
-        '<img src="assets/brand/vistify-wordmark.png" alt="Vistify">' +
-        '<div class="print-title">Digital Menu Board — Sales Summary</div>' +
-        '<div class="print-date">' + esc(dateStr) + '</div>' +
-      '</div>' +
-      my.html;
-    if (sib && sib.html) {
-      body += sib.html;
-    } else {
-      body += '<section class="print-block"><h2>Display Selection (Screen Selector)</h2>' +
-              '<div class="print-missing">No display selection saved yet — open the Screen Selector page to choose a display.</div>' +
-              '</section>';
-    }
-    body += '<div class="print-footer">Generated by the Vistify Digital Menu Board Sales Tool.</div>' +
-            '</div>';
-    area.innerHTML = body;
-    window.print();
-  }
-
-  // Restore prior calculator configuration (if any) BEFORE the initial compute
-  // so the UI loads with the user's last inputs already in place.
-  applyCalcStateToForm(loadCalcState());
-  compute();
-</script>
-
-<!-- Quote request modal — creates a Lead in Salesforce via Web-to-Lead.
-     Posts into a hidden iframe so the user never leaves the calculator. -->
-<div id="quoteModal" class="quote-modal hide" role="dialog" aria-modal="true" aria-labelledby="quoteModalTitle">
-  <div class="quote-modal-backdrop" onclick="closeQuoteModal()"></div>
-  <div class="quote-modal-card">
-    <button type="button" class="quote-modal-close" onclick="closeQuoteModal()" aria-label="Close">&times;</button>
-    <div id="quoteFormWrap">
-      <h3 id="quoteModalTitle">Request a Quote</h3>
-      <p class="quote-modal-sub">Send this configuration to our sales team and we'll reach out with pricing within 24 hours.</p>
-      <form id="quoteForm" action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&amp;orgId=00DHp000009vJXa" method="POST" target="quoteSubmitFrame">
-        <input type="hidden" name="oid" value="00DHp000009vJXa">
-        <input type="hidden" name="retURL" value="https://vistify-website-blush.vercel.app/thank-you">
-        <input type="hidden" name="lead_source" value="web">
-        <input type="hidden" name="description" id="quoteDescription" value="">
-        <div class="qf-row">
-          <div class="qf-field">
-            <label for="qf_first">First name *</label>
-            <input id="qf_first" name="first_name" maxlength="40" type="text" required>
-          </div>
-          <div class="qf-field">
-            <label for="qf_last">Last name *</label>
-            <input id="qf_last" name="last_name" maxlength="80" type="text" required>
-          </div>
-        </div>
-        <div class="qf-field">
-          <label for="qf_email">Email *</label>
-          <input id="qf_email" name="email" maxlength="80" type="email" required>
-        </div>
-        <div class="qf-row">
-          <div class="qf-field">
-            <label for="qf_phone">Phone</label>
-            <input id="qf_phone" name="phone" maxlength="40" type="tel">
-          </div>
-          <div class="qf-field">
-            <label for="qf_company">Company</label>
-            <input id="qf_company" name="company" maxlength="40" type="text">
-          </div>
-        </div>
-        <div class="qf-config">
-          <div class="qf-config-label">Included with your request</div>
-          <pre id="quoteConfigPreview"></pre>
-        </div>
-        <button type="submit" class="qf-submit" id="quoteSubmitBtn">Send quote request</button>
-        <div class="qf-alt">Prefer email? <a href="mailto:sales@vistifyinc.com">sales@vistifyinc.com</a> &middot; <a href="tel:+19492320070">(949) 232-0070</a></div>
-      </form>
-    </div>
-    <div id="quoteThanks" class="quote-thanks hide">
-      <div class="quote-thanks-icon">&#10003;</div>
-      <h3>Request sent</h3>
-      <p>Thanks! Your configuration is on its way to our sales team. We'll reach out within 24 hours.</p>
-      <button type="button" class="qf-submit" onclick="closeQuoteModal()">Done</button>
-    </div>
-    <iframe name="quoteSubmitFrame" style="display:none;" aria-hidden="true" title="Quote submission"></iframe>
-  </div>
-</div>
-<!-- Print-only summary; populated by printSummary() and hidden on screen. -->
-<div id="print-area" aria-hidden="true"></div>
-
-</body>
-</html>
+        if (maxTopY > padTop - 6 && maxTopY < flo
