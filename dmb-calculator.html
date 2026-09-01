@@ -1599,6 +1599,16 @@
     const surfaceSku = MOUNT_SURFACE_SKU[state.mountSurfaceType];
     if (surfaceSku) parts.push(kitQty + '× ' + surfaceSku);
     order.forEach(function (m) { parts.push(counts[m] + '× ' + m); });
+    // Drop-ceiling penetration extras: when all 3 heights are entered and the
+    // structural mounting surface sits above a lower drop ceiling, each pole
+    // passes through the drop ceiling and needs an escutcheon ring per kit
+    // plus one hole saw per bundle SKU shipped.
+    const ceilingEntered = state.ceilingHeight !== '' && state.ceilingHeight != null && parseFloat(state.ceilingHeight) > 0;
+    if (ceilingEntered && mountSurface > 0 && head > 0 && mountSurface > parseFloat(state.ceilingHeight)) {
+      const bundleCount = state.count <= 6 ? 1 : 2;
+      parts.push(kitQty + '× 2in Escutcheon Ring');
+      parts.push(bundleCount + '× 2-3/8" Hole Saw');
+    }
     return '(' + parts.join(', ') + ')';
   }
 
