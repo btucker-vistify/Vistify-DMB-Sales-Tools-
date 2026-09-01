@@ -1595,7 +1595,9 @@
       if (!(m in counts)) { counts[m] = 0; order.push(m); }
       counts[m] += kitQty;
     });
-    const parts = [kitQty + '× ' + SM_CB_CM_S_MODEL];
+    // SM-CB-CM-S is bundled in the base package and is NOT listed as a
+    // suffix line item; kitQty still drives the quantities of everything else.
+    const parts = [];
     const surfaceSku = MOUNT_SURFACE_SKU[state.mountSurfaceType];
     if (surfaceSku) parts.push(kitQty + '× ' + surfaceSku);
     order.forEach(function (m) { parts.push(counts[m] + '× ' + m); });
