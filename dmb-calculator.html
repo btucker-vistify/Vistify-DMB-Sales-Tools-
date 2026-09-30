@@ -947,7 +947,8 @@
           <option value="65">65"</option>
           <option value="75">75"</option>
         </select>
-        <div class="hint">Commercial LFD displays (Samsung, TCL, Sony)</div>
+        <div class="hint">Commercial LFD displays (Samsung, TCL, Sony, Hisense, LG)</div>
+        <div class="alert warn hide" id="sizeAvailWarn" style="margin-top:8px"></div>
       </div>
 
       <div class="field">
@@ -1435,6 +1436,7 @@
     // include the calculator config in its combined output.
     saveCalcSummaryToStorage();
     renderSkuPrefixHint();
+    renderSizeAvailWarning();
     drawDiagram(perScreenW, perScreenH, state.count);
     updateRecommendations();
     updateOverrideChip();
@@ -1713,6 +1715,29 @@
     } catch (e) { /* non-fatal */ }
     compute();
   }
+  // Sizes each Screen Selector series is offered in (default 32–75").
+  // Keep in sync with `sizes` on DISPLAYS in screen-selector.html.
+  const PREFIX_SIZES = {
+    'TCL-TB-':   [43, 55, 65, 75],
+    'SAM-QH-':   [43, 50, 55, 65, 75],
+    'SAM-QB-':   [43, 50, 55, 65, 75],
+    'SON-BZ40-': [55, 65, 75],
+    'SON-BZ35-': [43, 50, 55, 65, 75]
+  };
+  const DEFAULT_SIZES = [32, 43, 50, 55, 65, 75];
+  function renderSizeAvailWarning() {
+    const el = document.getElementById('sizeAvailWarn');
+    if (!el) return;
+    const prefix = getSkuPrefix();
+    const sizes = PREFIX_SIZES[prefix] || DEFAULT_SIZES;
+    const size = parseInt(state.size, 10);
+    if (prefix && !sizes.includes(size)) {
+      el.textContent = (getSkuPrefixName() || prefix) + ' is not available in ' + size + '". Available sizes: ' + sizes.join('", ') + '".';
+      el.classList.remove('hide');
+    } else {
+      el.classList.add('hide');
+    }
+  }
   function renderSkuPrefixHint() {
     const hint = document.getElementById('skuPrefixHint');
     if (!hint) return;
@@ -1728,6 +1753,16 @@
   // Re-render when the sibling page updates the prefix in another tab/window.
   window.addEventListener('storage', function (e) {
     if (e.key === SKU_PREFIX_KEY || e.key === SKU_PREFIX_NAME_KEY) compute();
+    // Screen Selector changed the screen size — mirror it here.
+    if (e.key === CALC_STATE_KEY) {
+      const st = loadCalcState();
+      if (st && st.size && String(st.size) !== String(state.size)) {
+        state.size = parseInt(st.size, 10);
+        const sz = document.getElementById('screenSize');
+        if (sz) sz.value = String(st.size);
+        compute();
+      }
+    }
   });
   // Wire the clear link.
   document.addEventListener('DOMContentLoaded', function () {

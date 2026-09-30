@@ -44,6 +44,8 @@
     --tcl: #1f9d55;
     --samsung: #1428a0;
     --sony: #111111;
+    --hisense: #00a5a8;
+    --lg: #a50034;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -344,8 +346,12 @@
   .brand-tcl { background: var(--tcl); }
   .brand-samsung { background: var(--samsung); }
   .brand-sony { background: var(--sony); }
+  .brand-hisense { background: var(--hisense); }
+  .brand-lg { background: var(--lg); }
   .brand-consumer { background: #6b7280; }
   .series-name { margin: 4px 0 0; font-size: 17px; font-weight: 700; color: var(--ink); }
+  .model-sub { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .size-note { font-size: 12px; color: var(--ink-3); margin: 14px 0 4px; text-align: center; }
   .cost-tier { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; color: var(--good); font-size: 16px; letter-spacing: 1px; }
   .cost-tier .muted { color: var(--line-2); }
   .match-bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 8px 0 12px; }
@@ -433,8 +439,26 @@
     <section class="panel" aria-label="Customer Questionnaire">
       <div class="panel-head"><h2>Customer Profile</h2></div>
       <div class="panel-body">
+        <div class="question">
+          <label class="q">1. Screen size</label>
+          <div class="hint">Recommendations rank the specific models sold in this size. Synced with the DMB Calculator's screen size.</div>
+          <div class="options" data-q="size">
+            <input type="radio" name="size" id="size-32" value="32" />
+            <label for="size-32">32&quot;</label>
+            <input type="radio" name="size" id="size-43" value="43" />
+            <label for="size-43">43&quot;</label>
+            <input type="radio" name="size" id="size-50" value="50" />
+            <label for="size-50">50&quot;</label>
+            <input type="radio" name="size" id="size-55" value="55" checked />
+            <label for="size-55">55&quot;</label>
+            <input type="radio" name="size" id="size-65" value="65" />
+            <label for="size-65">65&quot;</label>
+            <input type="radio" name="size" id="size-75" value="75" />
+            <label for="size-75">75&quot;</label>
+          </div>
+        </div>
         <div class="question has-guide">
-          <label class="q">1. Venue type & viewing angle <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <label class="q">2. Venue type & viewing angle <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Single QSR menu boards are viewed head-on (standard angle). Food / event halls have open layouts that need wide off-axis viewing (IPS).</div>
           <div class="options" data-q="venue">
             <input type="radio" name="venue" id="venue-qsr" value="qsr" checked />
@@ -448,7 +472,7 @@
           </div>
         </div>
         <div class="question has-guide">
-          <label class="q">2. Ambient lighting at the install location <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <label class="q">3. Ambient lighting at the install location <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Indoor only. Brighter interior spaces (atria, daylit dining rooms) need higher-NIT panels and a higher-haze (anti-glare) surface to cut reflections. Dim interiors favor lower haze for image clarity.</div>
           <div class="options" data-q="ambient">
             <input type="radio" name="ambient" id="amb-min" value="minimal" />
@@ -464,7 +488,7 @@
           </div>
         </div>
         <div class="question has-guide">
-          <label class="q">3. Content type <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <label class="q">4. Content type <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Vivid (food photography, motion, branded marketing) benefits from DCI-P3 gamut. Deep Black adds a dedicated low-reflectance layer for cinematic / dim-viewing content.</div>
           <div class="options" data-q="content">
             <input type="radio" name="content" id="con-std" value="standard" checked />
@@ -480,7 +504,7 @@
           </div>
         </div>
         <div class="question has-guide">
-          <label class="q">4. Operating hours <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <label class="q">5. Operating hours <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">How many hours per day will the display run? Commercial 24/7-rated panels resist burn-in and last longer under continuous load; lighter-use installs can use less-rated displays at lower cost.</div>
           <div class="options" data-q="runtime">
             <input type="radio" name="runtime" id="rt-min" value="minimal" />
@@ -496,7 +520,7 @@
           </div>
         </div>
         <div class="question has-guide">
-          <label class="q">5. Warranty service preference <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <label class="q">6. Warranty service preference <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="options" data-q="warranty">
             <input type="radio" name="warranty" id="war-fast" value="fast" checked />
             <label for="war-fast">Fast Track Replacement</label>
@@ -511,7 +535,7 @@
           </div>
         </div>
         <div class="question has-guide">
-          <label class="q">6. Built-in SoC with Device Management required? <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <label class="q">7. Built-in SoC with Device Management required? <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Commercial displays with built-in SoC reduce install complexity. Selecting No opens up the Consumer TV +VPlayer option.</div>
           <div class="options" data-q="soc">
             <input type="radio" name="soc" id="soc-yes" value="yes" checked />
@@ -526,7 +550,7 @@
         </div>
 
         <div class="question has-guide">
-          <label class="q">7. Budget tier <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
+          <label class="q">8. Budget tier <span class="guide-marker" aria-hidden="true">&#9432;</span></label>
           <div class="hint">Estimated cost factor from spec sheet. $ is the budget consumer option, $$$$$ is premium.</div>
           <div class="options" data-q="budget">
             <input type="radio" name="budget" id="bud-1" value="1" />
@@ -567,6 +591,8 @@
           <a class="brand-strip-item" href="https://us.tcl.com/pages/digital-signage" target="_blank" rel="noopener"><img src="assets/brand/tcl-logo.png" alt="TCL" /></a>
           <a class="brand-strip-item" href="https://pro.sony/ue_US/products/pro-displays" target="_blank" rel="noopener"><img src="assets/brand/sony-logo.png" alt="Sony" /></a>
           <a class="brand-strip-item" href="https://www.samsung.com/us/business/smart-signage/uhd-4k-signage/qm-series/" target="_blank" rel="noopener"><img src="assets/brand/samsung-logo.png" alt="Samsung" /></a>
+          <a class="brand-strip-item" href="https://www.hisense-b2b.com/en/43-4k-uhd-digital-signage-display-247-operation-dmseries" target="_blank" rel="noopener"><img src="assets/brand/hisense-logo.png" alt="Hisense" style="max-height:18px" /></a>
+          <a class="brand-strip-item" href="https://www.lg.com/global/business/commercial-display/digital-signage/standard/55ul5q-m/" target="_blank" rel="noopener"><img src="assets/brand/lg-logo.png" alt="LG" style="max-height:26px" /></a>
         </div>
       </div>
     </section>
@@ -585,6 +611,8 @@ const BRAND_THUMBS = {
   "TCL":         { src: "assets/displays/tcl-screen.jpg",      srcset: "assets/displays/tcl-screen.jpg 1x, assets/displays/tcl-screen@2x.jpg 2x" },
   "Samsung":     { src: "assets/displays/samsung-screen.jpg",  srcset: "assets/displays/samsung-screen.jpg 1x, assets/displays/samsung-screen@2x.jpg 2x" },
   "Sony":        { src: "assets/displays/sony-screen.jpg",     srcset: "assets/displays/sony-screen.jpg 1x, assets/displays/sony-screen@2x.jpg 2x" },
+  "Hisense":     { src: "assets/displays/hisense-screen.jpg",  srcset: "assets/displays/hisense-screen.jpg 1x, assets/displays/hisense-screen@2x.jpg 2x" },
+  "LG":          { src: "assets/displays/lg-screen.jpg",       srcset: "assets/displays/lg-screen.jpg 1x, assets/displays/lg-screen@2x.jpg 2x" },
   "Consumer TV": { src: "assets/displays/consumer-screen.jpg", srcset: "assets/displays/consumer-screen.jpg 1x, assets/displays/consumer-screen@2x.jpg 2x" }
 };
 const DISPLAYS = [
@@ -595,6 +623,15 @@ const DISPLAYS = [
     application:"Single QSR, Moderate Ambient Lighting, Vivid Content",
     appVenue:"qsr", appAmbient:"moderate", appContent:"vivid",
     soc:true,
+    models:{
+      32:{model:"TM32N", res:"FHD", gamut:"72% NTSC", gamutType:"ntsc"},
+      43:{model:"TM43N"},
+      // TCL makes no TM50N; the TX50Q fills the 50" slot as a 500-nit 24/7 IPS option.
+      // IPS, 500 nits, 24/7, 1200:1, 25% haze, 5-yr warranty (B&H listing); gamut per Almo.
+      50:{model:"TX50Q", panel:"IPS", staticContrast:"1200:1"},
+      55:{model:"TM55N", staticContrast:"5000:1"},
+      65:{model:"TM65N", staticContrast:"5000:1"},
+      75:{model:"TM75N", staticContrast:"5500:1"} },
     costTier:3 },
   { brand:"TCL",     brandClass:"brand-tcl",     series:"TB",   sku:"TCL-TB-",
     nits:400, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"24/7", panel:"VA",  angle:"Standard",
@@ -603,6 +640,7 @@ const DISPLAYS = [
     application:"Single QSR, Moderate Ambient Lighting, Standard Content",
     appVenue:"qsr", appAmbient:"moderate", appContent:"standard",
     soc:true,
+    models:{ 43:{model:"TB43N"}, 55:{model:"TB55N"}, 65:{model:"TB65N"}, 75:{model:"TB75N"} },
     costTier:2 },
   { brand:"Samsung", brandClass:"brand-samsung", series:"QH",   sku:"SAM-QH-",
     nits:700, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"24/7", panel:"VA",  angle:"Standard",
@@ -611,6 +649,7 @@ const DISPLAYS = [
     application:"Single QSR, High Ambient Lighting, Standard Content",
     appVenue:"qsr", appAmbient:"high", appContent:"standard",
     soc:true,
+    models:{ 43:{model:"QH43C"}, 50:{model:"QH50C"}, 55:{model:"QH55C"}, 65:{model:"QH65C"}, 75:{model:"QH75C"} },
     costTier:4 },
   { brand:"Samsung", brandClass:"brand-samsung", series:"QM",   sku:"SAM-QM-",
     nits:500, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"24/7", panel:"VA",  angle:"Standard",
@@ -619,6 +658,9 @@ const DISPLAYS = [
     application:"Single QSR, Moderate Ambient Lighting, Standard Content",
     appVenue:"qsr", appAmbient:"moderate", appContent:"standard",
     soc:true,
+    models:{
+      32:{model:"QM32C", res:"FHD", nits:400, haze:0.02},
+      43:{model:"QM43C"}, 50:{model:"QM50C"}, 55:{model:"QM55C"}, 65:{model:"QM65C"}, 75:{model:"QM75C"} },
     costTier:3 },
   { brand:"Samsung", brandClass:"brand-samsung", series:"QB",   sku:"SAM-QB-",
     nits:350, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"16/7", panel:"VA",  angle:"Standard",
@@ -627,7 +669,38 @@ const DISPLAYS = [
     application:"Single QSR, Minimal Ambient Lighting, Standard Content",
     appVenue:"qsr", appAmbient:"minimal", appContent:"standard",
     soc:true,
+    models:{ 43:{model:"QB43C"}, 50:{model:"QB50C"}, 55:{model:"QB55C"}, 65:{model:"QB65C"}, 75:{model:"QB75C"} },
     costTier:2 },
+  { brand:"Hisense", brandClass:"brand-hisense", series:"M66D", sku:"HIS-M66D-",
+    nits:500, gamut:"72% NTSC",   gamutType:"ntsc", runtime:"24/7", panel:"ADS", angle:"Wide",
+    staticContrast:"1200:1", dynContrast:"Mega",       haze:0.25, deepBlack:false,
+    warrantyYears:3, warrantyType:"Repair / Replace", warrantyCovers:["fast","onsite"],
+    application:"Food / Event Hall, Moderate Ambient Lighting, Standard Content",
+    appVenue:"hall", appAmbient:"moderate", appContent:"standard",
+    soc:true,
+    // Priced above Samsung QM, below LG and Sony BZ35 — same $$$ tier as QM,
+    // costRank breaks ties so Samsung QM sorts as the cheaper option.
+    models:{
+      32:{model:"32DM66D", res:"FHD"},
+      43:{model:"43DM66D"},
+      50:{model:"50DM66D", panel:"VA", gamut:"92% DCI-P3", gamutType:"dci", staticContrast:"5000:1"},
+      55:{model:"55DM66D"}, 65:{model:"65DM66D"}, 75:{model:"75DM66D"} },
+    costTier:3, costRank:3.5 },
+  { brand:"LG",      brandClass:"brand-lg",      series:"UL5Q-M", sku:"LG-UL5Q-",
+    nits:500, gamut:"80% DCI-P3", gamutType:"dci",  runtime:"24/7", panel:"ADS", angle:"Wide",
+    staticContrast:"1200:1", dynContrast:"1,000,000:1", haze:0.01, deepBlack:false,
+    warrantyYears:3, warrantyType:"Repair / Replace", warrantyCovers:["fast","onsite"],
+    application:"Food / Event Hall, Moderate Ambient Lighting, Vivid Content",
+    appVenue:"hall", appAmbient:"moderate", appContent:"vivid",
+    soc:true,
+    // Priced above Hisense M66D, below Sony BZ35 — same $$$$ tier as BZ35,
+    // costRank breaks ties so LG sorts as the cheaper option.
+    models:{
+      32:{model:"32UL5Q-M", res:"FHD", panel:"VA", gamut:"72% NTSC", gamutType:"ntsc", staticContrast:"4000:1", haze:0.25},
+      43:{model:"43UL5Q-M"},
+      50:{model:"50UL5Q-M", panel:"VA", staticContrast:"4500:1", haze:0.25},
+      55:{model:"55UL5Q-M"}, 65:{model:"65UL5Q-M"}, 75:{model:"75UL5Q-M"} },
+    costTier:4, costRank:3.8 },
   { brand:"Sony",    brandClass:"brand-sony",    series:"BZ40", sku:"SON-BZ40-",
     nits:700, gamut:"92% DCI-P3", gamutType:"dci",  runtime:"24/7", panel:"IPS", angle:"Wide",
     staticContrast:"1200:1", dynContrast:"600,000:1", haze:0.47, deepBlack:true,
@@ -635,14 +708,19 @@ const DISPLAYS = [
     application:"Food / Event Hall, High Ambient Lighting, Vivid Content",
     appVenue:"hall", appAmbient:"high", appContent:"vivid",
     soc:true,
+    models:{ 55:{model:"FW-55BZ40P"}, 65:{model:"FW-65BZ40P"}, 75:{model:"FW-75BZ40P"} },
     costTier:5 },
   { brand:"Sony",    brandClass:"brand-sony",    series:"BZ35", sku:"SON-BZ35-",
-    nits:550, gamut:"92% DCI-P3", gamutType:"dci",  runtime:"24/7", panel:"IPS", angle:"Wide",
+    nits:500, gamut:"92% DCI-P3", gamutType:"dci",  runtime:"24/7", panel:"IPS", angle:"Wide",
     staticContrast:"1200:1", dynContrast:"400,000:1", haze:0.25, deepBlack:false,
     warrantyYears:3, warrantyType:"Fast Track Replacement",
     application:"Food / Event Hall, Moderate Ambient Lighting, Vivid Content",
     appVenue:"hall", appAmbient:"moderate", appContent:"vivid",
     soc:true,
+    models:{
+      43:{model:"FW-43BZ35P"},
+      50:{model:"FW-50BZ35P", panel:"VA", staticContrast:"5000:1"},
+      55:{model:"FW-55BZ35P"}, 65:{model:"FW-65BZ35P"}, 75:{model:"FW-75BZ35P"} },
     costTier:4 },
   { brand:"Consumer TV", brandClass:"brand-consumer", series:"+VPlayer", sku:"vPlayer-",
     omitSeriesSuffix:true,
@@ -652,8 +730,34 @@ const DISPLAYS = [
     application:"Budget Conscious, Disposable Use",
     appVenue:"budget", appAmbient:"minimal", appContent:"standard",
     soc:false,
+    models:{ 32:{}, 43:{}, 50:{}, 55:{}, 65:{}, 75:{} },
     costTier:1 },
 ];
+
+// ---------------------------------------------------------------------------
+// Per-model catalog — each series above lists the sizes it's sold in under
+// `models`, with any spec that differs from the series default. Ranking runs
+// on MODELS filtered to the chosen screen size. Wide viewing angle follows the
+// panel type (IPS / ADS = Wide, VA = Standard).
+// ---------------------------------------------------------------------------
+const MODELS = [];
+DISPLAYS.forEach(function (series) {
+  Object.keys(series.models || {}).forEach(function (size) {
+    const m = Object.assign({}, series, { res: "UHD" }, series.models[size]);
+    m.size = parseInt(size, 10);
+    m.angle = m.panel === "VA" ? "Standard" : "Wide";
+    if (series.brand !== "Consumer TV") {
+      m.appContent = m.gamutType === "dci" ? "vivid" : "standard";
+      m.application = series.application.replace(/(Vivid|Standard) Content/, m.appContent === "vivid" ? "Vivid Content" : "Standard Content");
+    }
+    m.label = m.model ? m.brand + " " + m.model : m.brand + " " + m.series + " " + m.size + '"';
+    m.seriesLabel = m.series + (m.omitSeriesSuffix ? "" : " Series");
+    delete m.models;
+    MODELS.push(m);
+  });
+});
+function seriesSizes(d) { return Object.keys(d.models || {}).map(Number); }
+
 
 // ---------------------------------------------------------------------------
 // Sibling sync — share the selected SKU Prefix with the DMB Calculator page,
@@ -669,10 +773,11 @@ const SKU_BODY_KEY = "vistify.skuBody";
 const SELECTOR_PREFS_KEY = "vistify.selectorPrefs";
 const SELECTOR_SUMMARY_KEY = "vistify.selectorSummary";
 const CALC_SUMMARY_KEY = "vistify.calcSummary";
-const RADIO_NAMES = ["venue","ambient","content","runtime","warranty","soc","budget"];
+const RADIO_NAMES = ["size","venue","ambient","content","runtime","warranty","soc","budget"];
 
 // Pretty labels for the customer-profile answers.
 const PROFILE_LABELS = {
+  size:      { q: "Screen size",      map: { "32":"32\"", "43":"43\"", "50":"50\"", "55":"55\"", "65":"65\"", "75":"75\"" }},
   venue:     { q: "Venue",            map: { qsr:"Single QSR (standard angle)", hall:"Food / Event Hall (wide angle)" }},
   ambient:   { q: "Ambient lighting", map: { minimal:"Minimal (dim interior)", moderate:"Moderate (retail / lobby)", high:"High (bright atrium)" }},
   content:   { q: "Content type",     map: { standard:"Standard", vivid:"Vivid (food / motion / branded)", deepblack:"Deep Black (cinematic / dim viewing)" }},
@@ -734,6 +839,10 @@ function updateSkuPillFromStorage() {
 }
 // Pick up live updates from the calculator opened in another tab.
 window.addEventListener("storage", function (e) {
+  if (e.key === CALC_STATE_KEY && applySizeFromCalc()) {
+    savePrefsToStorage();
+    if (document.querySelector("#results .cards")) document.getElementById("recommend-btn").click();
+  }
   if (e.key === SKU_BODY_KEY || e.key === SKU_PREFIX_KEY) updateSkuPillFromStorage();
 });
 
@@ -786,6 +895,9 @@ function clearAllSelectorState() {
 // ---------------------------------------------------------------------------
 function findDisplayBySku(prefix) {
   if (!prefix) return null;
+  const size = selectedSize();
+  const m = MODELS.find(x => x.sku === prefix && x.size === size);
+  if (m) return m;
   for (let i = 0; i < DISPLAYS.length; i++) {
     if (DISPLAYS[i].sku === prefix) return DISPLAYS[i];
   }
@@ -817,6 +929,7 @@ function buildSelectorSummary() {
     tLines.push("Brand & Model:     (none chosen yet)");
   }
   if (d) {
+    if (d.size) tLines.push("Size / Resolution: " + d.size + '" / ' + d.res);
     tLines.push("Brightness:        " + d.nits + " NITs");
     tLines.push("Color gamut:       " + d.gamut);
     tLines.push("Runtime:           " + d.runtime);
@@ -853,6 +966,7 @@ function buildSelectorSummary() {
     rows += kvRow("Brand & Model", "<em>(none chosen yet)</em>");
   }
   if (d) {
+    if (d.size) rows += kvRow("Size / Resolution", esc(d.size) + '" / ' + esc(d.res));
     rows += kvRow("Brightness", esc(d.nits) + " NITs");
     rows += kvRow("Color gamut", esc(d.gamut));
     rows += kvRow("Runtime", esc(d.runtime));
@@ -982,10 +1096,19 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll('input[type="radio"]').forEach(function (r) {
     r.addEventListener("change", savePrefsToStorage);
   });
-  // 2. Restore prior questionnaire answers if we have them.
+  // 2. Restore prior questionnaire answers if we have them. The calculator's
+  //    screen size wins over a stale saved size.
   const saved = loadPrefsFromStorage();
+  if (saved) applyPrefsToForm(saved);
+  applySizeFromCalc();
+  // Changing size re-ranks straight away if results are already showing.
+  document.querySelectorAll('input[name="size"]').forEach(function (r) {
+    r.addEventListener("change", function () {
+      writeSizeToCalc();
+      if (document.querySelector("#results .cards")) document.getElementById("recommend-btn").click();
+    });
+  });
   if (saved) {
-    applyPrefsToForm(saved);
     // Auto-render recommendation so the results panel (and SKU pill) come back.
     const btn = document.getElementById("recommend-btn");
     if (btn) btn.click();
@@ -1007,6 +1130,38 @@ function val(name) {
   const el = document.querySelector(`input[name="${name}"]:checked`);
   return el ? el.value : null;
 }
+
+// Screen size — shared with the DMB Calculator via vistify.calcState.size.
+const CALC_STATE_KEY = "vistify.calcState";
+function readCalcState() {
+  try { const raw = localStorage.getItem(CALC_STATE_KEY); return raw ? JSON.parse(raw) : null; }
+  catch (e) { return null; }
+}
+function selectedSize() {
+  const v = parseInt(val("size"), 10);
+  return isNaN(v) ? 55 : v;
+}
+// Push the selector's size into the calculator's saved state.
+function writeSizeToCalc() {
+  try {
+    const st = readCalcState() || {};
+    const size = selectedSize();
+    if (parseInt(st.size, 10) === size) return;
+    st.size = size;
+    localStorage.setItem(CALC_STATE_KEY, JSON.stringify(st));
+  } catch (e) { /* non-fatal */ }
+}
+// Pull the calculator's size into the selector's size question. Returns true if it changed.
+function applySizeFromCalc() {
+  const st = readCalcState();
+  const size = st && parseInt(st.size, 10);
+  if (!size) return false;
+  const radio = document.getElementById("size-" + size);
+  if (!radio || radio.checked) return false;
+  radio.checked = true;
+  return true;
+}
+function modelsForSize(size) { return MODELS.filter(m => m.size === size); }
 
 function scoreDisplay(d, prefs) {
   let score = 0, max = 0;
@@ -1138,10 +1293,10 @@ function scoreDisplay(d, prefs) {
   if (prefs.warranty === "any") {
     score += 15;
     reasons.push({ kind: "good", text: `${d.warrantyYears}-yr ${d.warrantyType}` });
-  } else if (prefs.warranty === "fast" && d.warrantyType.startsWith("Fast")) {
+  } else if (prefs.warranty === "fast" && (d.warrantyType.startsWith("Fast") || (d.warrantyCovers || []).includes("fast"))) {
     score += 15;
     reasons.push({ kind: "good", text: `${d.warrantyYears}-yr ${d.warrantyType}` });
-  } else if (prefs.warranty === "onsite" && d.warrantyType.startsWith("OnSite")) {
+  } else if (prefs.warranty === "onsite" && (d.warrantyType.startsWith("OnSite") || (d.warrantyCovers || []).includes("onsite"))) {
     score += 15;
     reasons.push({ kind: "good", text: `${d.warrantyYears}-yr ${d.warrantyType}` });
   } else {
@@ -1203,12 +1358,12 @@ function renderResults(ranked, prefs) {
     <div class="top-pick">
       <span class="top-pick-icon">&#9733;</span>
       <div class="top-pick-text">
-        <strong>${top.d.brand} ${top.d.series}${top.d.omitSeriesSuffix ? "" : " Series"}</strong> is the top match (${top.pct}% fit).
+        <strong>${top.d.label}</strong> (${top.d.seriesLabel}) is the top match (${top.pct}% fit).
         ${top.d.application}.
       </div>
     </div>
     <div class="selection-bar" id="selection-bar">
-      <div class="sel-text">Selected: <strong id="sel-name">${top.d.brand} ${top.d.series}${top.d.omitSeriesSuffix ? "" : " Series"}</strong></div>
+      <div class="sel-text">Selected: <strong id="sel-name">${top.d.label} (${top.d.seriesLabel})</strong></div>
       <div class="sku-pill" id="sku-pill" title="Click to copy">
         <span class="sku-label">SKU Prefix</span>
         <span id="sku-value">${top.d.sku || "—"}</span>
@@ -1231,14 +1386,15 @@ function renderResults(ranked, prefs) {
       : "";
 
     html += `
-      <div class="card ${rankClass} ${dimmed} ${rank === 1 ? "selected" : ""}" data-idx="${idx}" data-sku="${d.sku}" data-name="${d.brand} ${d.series}${d.omitSeriesSuffix ? "" : " Series"}">
+      <div class="card ${rankClass} ${dimmed} ${rank === 1 ? "selected" : ""}" data-idx="${idx}" data-sku="${d.sku}" data-name="${d.label} (${d.seriesLabel})">
         <span class="rank-badge">${rankLabel}</span>
         <span class="selected-check">&#10003;</span>
         <div class="card-head">
           <div class="head-left">
             <div class="head-text">
               <span class="brand-tag ${d.brandClass}">${d.brand}</span>
-              <div class="series-name">${d.series}${d.omitSeriesSuffix ? "" : " Series"}</div>
+              <div class="series-name">${d.model || d.seriesLabel}</div>
+              <div class="model-sub">${d.model ? d.seriesLabel + " · " : ""}${d.size}&quot; · ${d.res}</div>
             </div>
           </div>
           <div class="head-right">
@@ -1260,6 +1416,7 @@ function renderResults(ranked, prefs) {
           <div class="spec-row"><span class="k">SoC Mgmt</span><span class="v">${d.soc ? "Yes" : "No"}</span></div>
           <div class="spec-row"><span class="k">Warranty</span><span class="v">${d.warrantyYears}-yr</span></div>
           <div class="spec-row"><span class="k">Service</span><span class="v">${d.warrantyType}</span></div>
+          <div class="spec-row"><span class="k">Resolution</span><span class="v">${d.res}</span></div>
         </div>
         <div class="app-line"><strong>Recommended for:</strong> ${d.application}</div>
         <div class="reasons">
@@ -1274,13 +1431,17 @@ function renderResults(ranked, prefs) {
 
   html += `</div>`;
 
+  const missing = DISPLAYS.filter(sr => !(sr.models || {})[prefs.size]).map(sr => sr.brand + " " + sr.series);
+  if (missing.length) {
+    html += `<div class="size-note">Not offered in ${prefs.size}&quot;: ${missing.join(", ")}.</div>`;
+  }
   html += `
     <details class="compare">
-      <summary>Full side-by-side comparison (all 7 series)</summary>
+      <summary>Full side-by-side comparison (all ${ranked.length} models at ${prefs.size}&quot;)</summary>
       <div style="overflow-x:auto">
         <table class="compare-table">
           <thead><tr>
-            <th>Series</th><th>NITs</th><th>Gamut</th><th>Runtime</th>
+            <th>Model</th><th>NITs</th><th>Gamut</th><th>Runtime</th>
             <th>Panel</th><th>Angle</th><th>Static&nbsp;C.</th><th>Dyn.&nbsp;C.</th>
             <th>Haze</th><th>Deep&nbsp;Black</th><th>SoC</th><th>Warranty</th><th>Service</th>
             <th>Cost</th>
@@ -1288,7 +1449,7 @@ function renderResults(ranked, prefs) {
           <tbody>
             ${ranked.map(r => `
               <tr>
-                <td><span class="brand-tag ${r.d.brandClass}">${r.d.brand}</span> <strong>${r.d.series}</strong></td>
+                <td><span class="brand-tag ${r.d.brandClass}">${r.d.brand}</span> <strong>${r.d.model || r.d.series}</strong></td>
                 <td class="num">${r.d.nits}</td>
                 <td>${r.d.gamut}</td>
                 <td class="num">${r.d.runtime}</td>
@@ -1333,7 +1494,7 @@ function renderResults(ranked, prefs) {
     if (selSku)  selSku.textContent  = restoredCard.getAttribute("data-sku") || "—";
   } else {
     // No prior selection — save the top pick as the active prefix.
-    saveSkuPrefix(top.d.sku || "", `${top.d.brand} ${top.d.series}${top.d.omitSeriesSuffix ? "" : " Series"}`);
+    saveSkuPrefix(top.d.sku || "", `${top.d.label} (${top.d.seriesLabel})`);
   }
   // Reflect prefix + (calculator-published) body on the SKU pill.
   updateSkuPillFromStorage();
@@ -1401,6 +1562,7 @@ function getPrefs() {
     soc:       val("soc"),
     warranty:  val("warranty"),
     budget:    val("budget"),
+    size:      selectedSize(),
   };
 }
 
@@ -1408,9 +1570,10 @@ document.getElementById("recommend-btn").addEventListener("click", () => {
   const prefs = getPrefs();
   // Persist the questionnaire so navigation away/back keeps the user's answers.
   savePrefsToStorage();
-  const ranked = DISPLAYS
+  writeSizeToCalc();
+  const ranked = modelsForSize(selectedSize())
     .map(d => ({ d, ...scoreDisplay(d, prefs) }))
-    .sort((a, b) => b.pct - a.pct || a.d.costTier - b.d.costTier);
+    .sort((a, b) => b.pct - a.pct || (a.d.costRank ?? a.d.costTier) - (b.d.costRank ?? b.d.costTier));
   renderResults(ranked, prefs);
 });
 

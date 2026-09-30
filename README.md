@@ -10,7 +10,7 @@ dependencies — and intended to be hosted on GitHub Pages.
 | --- | --- |
 | `index.html` | Landing page. Redirects to `dmb-calculator.html`. |
 | `dmb-calculator.html` | **Measurement Calculator.** Size the array (screen count, screen size, orientation), pick wall vs. ceiling mount, and get the Configuration SKU plus required pole hardware. |
-| `screen-selector.html` | **Commercial Display Brand & Model Selector.** Customer-profile questionnaire that ranks TCL, Samsung, Sony, and consumer-TV-plus-player options and outputs an SKU Prefix for the recommended display. |
+| `screen-selector.html` | **Commercial Display Brand & Model Selector.** Customer-profile questionnaire that ranks specific TCL, Samsung, Sony, Hisense and LG models (plus a consumer-TV-plus-player option) for the chosen screen size and outputs an SKU Prefix for the recommended series. |
 
 The two pages are designed as siblings: the Screen Selector chooses the
 *display brand/model* (the SKU prefix), and the Calculator chooses the
@@ -49,7 +49,7 @@ Storage keys (all under the `vistify.*` namespace):
 | `vistify.skuPrefixName` | `screen-selector.html` | `dmb-calculator.html` | Human-readable display name, e.g. `TCL TM Series`. |
 | `vistify.skuBody` | `dmb-calculator.html` | `screen-selector.html` | The computed configuration SKU body, e.g. `3x55WL`. |
 | `vistify.selectorPrefs` | `screen-selector.html` | `screen-selector.html` | JSON of the questionnaire answers, so the form survives navigation. |
-| `vistify.calcState` | `dmb-calculator.html` | `dmb-calculator.html` | JSON of the full calculator configuration (count, size, orientation, mount type, ceiling height, head clearance, etc.), so the calculator's inputs survive navigation. |
+| `vistify.calcState` | `dmb-calculator.html` (and `screen-selector.html` writes `size`) | `dmb-calculator.html`, `screen-selector.html` | JSON of the full calculator configuration (count, size, orientation, mount type, ceiling height, head clearance, etc.), so the calculator's inputs survive navigation. |
 
 The prefix keys are cleared together from the calculator via the **clear**
 link beneath the Configuration SKU pill. Both pages listen for the browser
@@ -118,7 +118,9 @@ GitHub Pages will serve `index.html` at the root URL, which forwards to
 │   │   ├── vistify-wordmark.png  # Header wordmark on every page
 │   │   ├── tcl-logo.png          # Brand strip logos (selector page)
 │   │   ├── samsung-logo.png
-│   │   └── sony-logo.png
+│   │   ├── sony-logo.png
+│   │   ├── hisense-logo.png
+│   │   └── lg-logo.png
 │   ├── favicon/                  # All non-root favicon sizes + apple-touch-icon
 │   │   ├── favicon-16.png
 │   │   ├── favicon-32.png
@@ -130,6 +132,8 @@ GitHub Pages will serve `index.html` at the root URL, which forwards to
 │   │   ├── tcl-screen.jpg + tcl-screen@2x.jpg
 │   │   ├── samsung-screen.jpg + samsung-screen@2x.jpg
 │   │   ├── sony-screen.jpg + sony-screen@2x.jpg
+│   │   ├── hisense-screen.jpg + hisense-screen@2x.jpg
+│   │   ├── lg-screen.jpg + lg-screen@2x.jpg
 │   │   └── consumer-screen.jpg + consumer-screen@2x.jpg
 │   └── guides/                   # Hover-popover reference illustrations
 │       ├── viewing-angle.jpg + viewing-angle@2x.jpg
